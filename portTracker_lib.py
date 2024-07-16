@@ -37,7 +37,7 @@ class portTracker:
         local_addresses.append(socket.gethostbyname(socket.gethostname()))
     except:
         # Dumb admin?
-        print "WARNING: Your host file miss an entry for " + socket.gethostname()
+        print("WARNING: Your host file miss an entry for " + socket.gethostname())
 
     def addLocalAddress(self, addr):
 
@@ -84,7 +84,7 @@ class portTracker:
                     else:
                         s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
                     s.bind((host, port))
-                except socket.error, e:
+                except socket.error as e:
                     # Not available
                     if (max_port != 0):
                         debug("port %i is already in use by another program (bind error on 0.0.0.0 -> %s)" % (port, e))
@@ -170,8 +170,8 @@ class portTracker:
     def showTcpPortAllocation(self):
 
         for (host, ports) in self.tcptrack.iteritems():
-            print "%s is using the following TCP ports" % host
-            print ports
+            print("%s is using the following TCP ports" % host)
+            print(ports)
 
 def setdebug(flag):
     """ If true, print out debugs
@@ -188,9 +188,9 @@ def debug(string):
 
     if DEBUG:
         curtime = time.strftime("%H:%M:%S")
-        print "%s: DEBUG (1): PORT TRACKER: %s" % (curtime, unicode(string))
+        print("%s: DEBUG (1): PORT TRACKER: %s" % (curtime, unicode(string)))
 
 if __name__ == '__main__':
 
     track = portTracker()
-    print track.allocateTcpPort('localhost', 7200, 4)
+    print(track.allocateTcpPort('localhost', 7200, 4))

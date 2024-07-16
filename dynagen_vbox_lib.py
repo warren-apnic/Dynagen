@@ -39,19 +39,19 @@ if debuglevel > 0:
         dfile = open(debugfilename, 'wb')
     except:
         dfile = 0
-        print "WARNING: log file cannot be created !"
+        print("WARNING: log file cannot be created !")
     if dfile:
-        print "Log file = %s" % str(debugfilename)
+        print("Log file = %s" % str(debugfilename))
 
 def debugmsg(level, message):
     if debuglevel == 0:
         return
     if debuglevel >= level:
-        print message
+        print(message)
         if dfile:
-            #In python 2.6, print with redirections always uses UNIX line-ending,
+            #In python 2.6, print(with redirections always uses UNIX line-ending,)
             # so I must add os-neutral line-endings.
-            print >> dfile, message,
+            print(message, file=dfile)
             dfile.write(os.linesep)
             dfile.flush()
 
@@ -129,7 +129,7 @@ class VBox(object):
             try:
                 self.s = socket.create_connection((self.host, self.port), timeout)
             except:
-                raise DynamipsError, '101-Could not connect to vboxwrapper at %s:%i' % (self.host, self.port)
+                raise DynamipsError('101-Could not connect to vboxwrapper at %s:%i' % (self.host, self.port))
         #version checking
         try:
             version = send(self, 'vboxwrapper version')[0][4:]
@@ -147,11 +147,11 @@ class VBox(object):
                 rcver = .999
             intver = int(major) * 10000 + int(minor) * 100 + int(sub) + rcver
         except:
-            #print 'Warning: problem determing vboxwrapper server version on host: %s. Skipping version check' % self.host
+            #print('Warning: problem determing vboxwrapper server version on host: %s. Skipping version check' % self.host)
             intver = 999999
 
         if intver < INTVER:
-            raise DynamipsVerError, '101-This version of Dynagen requires at least version %s of vboxwrapper. \n Server %s is runnning version %s.' % (STRVER, self.host, version)
+            raise DynamipsVerError('101-This version of Dynagen requires at least version %s of vboxwrapper. \n Server %s is runnning version %s.' % (STRVER, self.host, version))
         self._version = version
 
         #vbox version checking
@@ -244,7 +244,7 @@ class VBox(object):
             return
 
         if type(directory) not in [str, unicode]:
-            raise DynamipsError, 'invalid directory'
+            raise DynamipsError('invalid directory')
         # send to vboxwrapper encased in quotes to protect spaces
         send(self, 'vboxwrapper working_dir %s' % '"' + directory + '"')
         self._workingdir = directory
@@ -353,7 +353,7 @@ class AnyVBoxEmuDevice(object):
         debugmsg(2, "AnyVBoxEmuDevice::start()")
 
         if self.state == 'running':
-            raise DynamipsWarning, 'virtualized device %s is already running' % self.name
+            raise DynamipsWarning('virtualized device %s is already running' % self.name)
 
         r = send(self.p, 'vbox start %s' % self.name)
         r = send(self.p, 'vbox start %s' % self.name)
@@ -370,7 +370,7 @@ class AnyVBoxEmuDevice(object):
         debugmsg(2, "AnyVBoxEmuDevice::stop()")
 
         if self.state == 'stopped':
-            raise DynamipsWarning, 'virtualized device %s is already stopped' % self.name
+            raise DynamipsWarning('virtualized device %s is already stopped' % self.name)
         self.state = 'stopped'
         r = send(self.p, 'vbox stop %s' % self.name)
         r = send(self.p, 'vbox stop %s' % self.name)
@@ -385,7 +385,7 @@ class AnyVBoxEmuDevice(object):
         debugmsg(2, "AnyVBoxEmuDevice::reset()")
 
         if self.state == 'stopped':
-            raise DynamipsWarning, 'virtualized device %s is already stopped' % self.name
+            raise DynamipsWarning('virtualized device %s is already stopped' % self.name)
         r = send(self.p, 'vbox reset %s' % self.name)
         r = send(self.p, 'vbox reset %s' % self.name)
         self.state = 'running'
@@ -417,10 +417,10 @@ class AnyVBoxEmuDevice(object):
         debugmsg(2, "AnyVBoxEmuDevice::displayWindowFocus()")
         #only for local hypervisors !
         if self.state == 'stopped':
-            raise DynamipsWarning, 'virtualized device %s is stopped and cannot be focused on' % self.name
+            raise DynamipsWarning('virtualized device %s is stopped and cannot be focused on' % self.name)
             return 0
         if not self.isLocalhost(self.p.name):
-            #raise DynamipsWarning, 'virtualized device %s is running on non-local hypervisor' % self.name
+            #raise DynamipsWarning('virtualized device %s is running on non-local hypervisor' % self.name)
             return 0
         # We use double-query, because Multi-threaded server often returns previous result.
         r = send(self.p, 'vbox display_window_focus %s' % self.name)
@@ -437,7 +437,7 @@ class AnyVBoxEmuDevice(object):
         """suspends the virtualized device instance in VBox"""
         debugmsg(2, "AnyVBoxEmuDevice::suspend()")
         if self.state == 'suspended':
-            raise DynamipsWarning, 'virtualized device %s is already suspended' % self.name
+            raise DynamipsWarning('virtualized device %s is already suspended' % self.name)
 
         r = send(self.p, 'vbox suspend %s' % self.name)
         r = send(self.p, 'vbox suspend %s' % self.name)
@@ -453,9 +453,9 @@ class AnyVBoxEmuDevice(object):
         """resumes the virtualized device instance in VBox"""
         debugmsg(2, "AnyVBoxEmuDevice::resume()")
         if self.state == 'running':
-            raise DynamipsWarning, 'virtualized device %s is already running' % self.name
+            raise DynamipsWarning('virtualized device %s is already running' % self.name)
         if self.state == 'stopped':
-            raise DynamipsWarning, 'virtualized device %s is stopped and cannot be resumed' % self.name
+            raise DynamipsWarning('virtualized device %s is stopped and cannot be resumed' % self.name)
 
         r = send(self.p, 'vbox resume %s' % self.name)
         r = send(self.p, 'vbox resume %s' % self.name)
@@ -470,12 +470,12 @@ class AnyVBoxEmuDevice(object):
         """sends GuestControl execute commands to the virtualized device instance in VBox"""
         debugmsg(2, "AnyVBoxEmuDevice::vboxexec(%s)" % unicode(command))
         if self.state != 'running':
-            raise DynamipsError, 'virtualized device %s is not running' % self.name
+            raise DynamipsError('virtualized device %s is not running' % self.name)
             return
 
         r = send(self.p, 'vbox exec %s %s' % (self.name, command))
         r = send(self.p, 'vbox exec %s %s' % (self.name, command))
-        #print "ADEBUG: dynagen_vbox_lib.py: r[0][0:10] = %s" % r[0][0:10]
+        #print("ADEBUG: dynagen_vbox_lib.py: r[0][0:10] = %s" % r[0][0:10])
         return r
 
     def _setconsole(self, console):
@@ -485,13 +485,13 @@ class AnyVBoxEmuDevice(object):
         debugmsg(2, "AnyVBoxEmuDevice::_setconsole(%s)" % str(console))
 
         if type(console) != int or console < 1 or console > 65535:
-            raise DynamipsError, 'invalid console port'
+            raise DynamipsError('invalid console port')
         
         if console == self._console:
             return
         
         if not self.track.tcpPortIsFree(self.p.host, console):
-            raise DynamipsError, 'console port %i is already in use' % console
+            raise DynamipsError('console port %i is already in use' % console)
 
         send(self.p, 'vbox setattr %s console %i' % (self.name, console))
         self.track.setTcpPort(self.p.host, console)
@@ -514,7 +514,7 @@ class AnyVBoxEmuDevice(object):
         debugmsg(2, "AnyVBoxEmuDevice::_setnics(%s)" % str(nics))
 
         if type(nics) != int:
-            raise DynamipsError, 'invalid nics number'
+            raise DynamipsError('invalid nics number')
 
         send(self.p, 'vbox setattr %s nics %s' % (self.name, str(nics)))
         self._nics = nics
@@ -542,7 +542,7 @@ class AnyVBoxEmuDevice(object):
         debugmsg(2, "AnyVBoxEmuDevice::_setnetcard(%s)" % str(netcard))
 
         if type(netcard) not in [str, unicode]:
-            raise DynamipsError, 'invalid netcard'
+            raise DynamipsError('invalid netcard')
 
         send(self.p, 'vbox setattr %s netcard %s' % (self.name, netcard))
         self._netcard = netcard
@@ -563,7 +563,7 @@ class AnyVBoxEmuDevice(object):
         debugmsg(2, "AnyVBoxEmuDevice::_setimage(%s)" % unicode(image))
 
         if type(image) not in [str, unicode]:
-            raise DynamipsError, 'invalid image'
+            raise DynamipsError('invalid image')
 
         # Can't verify existance of image because path is relative to backend
         #send the image filename enclosed in quotes to protect it
@@ -586,7 +586,7 @@ class AnyVBoxEmuDevice(object):
         debugmsg(2, "AnyVBoxEmuDevice::_setguestcontrol_user(%s)" % unicode(guestcontrol_user))
 
         if type(guestcontrol_user) not in [str, unicode]:
-            raise DynamipsError, 'invalid guestcontrol_user'
+            raise DynamipsError('invalid guestcontrol_user')
 
         #send the options enclosed in quotes to protect them
         send(self.p, 'vbox setattr %s guestcontrol_user %s' % (self.name, '"' + guestcontrol_user + '"'))
@@ -608,7 +608,7 @@ class AnyVBoxEmuDevice(object):
         debugmsg(2, "AnyVBoxEmuDevice::_setguestcontrol_password(%s)" % unicode(guestcontrol_password))
 
         if type(guestcontrol_password) not in [str, unicode]:
-            raise DynamipsError, 'invalid guestcontrol_password'
+            raise DynamipsError('invalid guestcontrol_password')
 
         #send the options enclosed in quotes to protect them
         send(self.p, 'vbox setattr %s guestcontrol_password %s' % (self.name, '"' + guestcontrol_password + '"'))
@@ -630,7 +630,7 @@ class AnyVBoxEmuDevice(object):
         debugmsg(2, "AnyVBoxEmuDevice::_setfirst_nic_managed(%s)" % str(first_nic_managed))
 
         if type(first_nic_managed) != bool:
-            raise DynamipsError, 'invalid first nic managed option'
+            raise DynamipsError('invalid first nic managed option')
 
         send(self.p, 'vbox setattr %s first_nic_managed %s' % (self.name, str(first_nic_managed)))
         self._first_nic_managed = first_nic_managed
@@ -651,7 +651,7 @@ class AnyVBoxEmuDevice(object):
         debugmsg(2, "AnyVBoxEmuDevice::_setheadless_mode(%s)" % str(headless_mode))
 
         if type(headless_mode) != bool:
-            raise DynamipsError, 'invalid headless mode option'
+            raise DynamipsError('invalid headless mode option')
 
         send(self.p, 'vbox setattr %s headless_mode %s' % (self.name, str(headless_mode)))
         self._headless_mode = headless_mode
@@ -672,7 +672,7 @@ class AnyVBoxEmuDevice(object):
         debugmsg(2, "AnyVBoxEmuDevice::_setconsole_support(%s)" % str(console_support))
 
         if type(console_support) != bool:
-            raise DynamipsError, 'invalid console support option'
+            raise DynamipsError('invalid console support option')
 
         send(self.p, 'vbox setattr %s console_support %s' % (self.name, str(console_support)))
         self._console_support = console_support
@@ -693,7 +693,7 @@ class AnyVBoxEmuDevice(object):
         debugmsg(2, "AnyVBoxEmuDevice::_setconsole_telnet_server(%s)" % str(console_telnet_server))
 
         if type(console_telnet_server) != bool:
-            raise DynamipsError, 'invalid console telnet server support option'
+            raise DynamipsError('invalid console telnet server support option')
 
         send(self.p, 'vbox setattr %s console_telnet_server %s' % (self.name, str(console_telnet_server)))
         self._console_telnet_server = console_telnet_server
@@ -768,7 +768,7 @@ class AnyVBoxEmuDevice(object):
             try:
                 dst_port = remote_slot.interfaces[remote_int][remote_port]
             except KeyError:
-                raise DynamipsError, 'invalid interface'
+                raise DynamipsError('invalid interface')
 
         debugmsg(3, "AnyVBoxEmuDevice::connect_to_dynamips()    validate_connect")
         #validate the connection
@@ -928,7 +928,7 @@ class AnyVBoxEmuDevice(object):
         statBytesReceived = statBytesSent = "0"
         try:
             guestStats = self.get_nio_stats(port)
-            #print "guestStats raw = ", guestStats
+            #print("guestStats raw = ", guestStats)
             statBytesReceived = guestStats[0][13:].split()[0]
             statBytesSent = guestStats[0][13:].split()[1]
             debugmsg(3, "dynagen_vbox_lib.py: statBytesReceived = %s" % str(statBytesReceived))

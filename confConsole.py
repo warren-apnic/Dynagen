@@ -49,7 +49,7 @@ else:
 def error(msg):
     """Print out an error message"""
 
-    print '*** Error:', unicode(msg)
+    print('*** Error:', unicode(msg))
 
 
 def debug(string):
@@ -59,7 +59,7 @@ def debug(string):
     # Debug level 2, console debugs
     if __main__.dynagen.debuglevel >= 2:
         curtime = time.strftime("%H:%M:%S")
-        print "%s: DEBUG (2): %s" % (curtime, unicode(string))
+        print("%s: DEBUG (2): %s" % (curtime, unicode(string)))
 
 
 ##############end of some functions from console.py##################
@@ -97,7 +97,7 @@ class AbstractConsole(cmd.Cmd):
         """
 
         cmd.Cmd.postloop(self)  ## Clean up command completion
-        print 'Exiting...'
+        print('Exiting...')
 
     def precmd(self, line):
         """ This method is called after the line has been input but before
@@ -134,13 +134,13 @@ class AbstractConsole(cmd.Cmd):
 \tExecute python statements"""
 
             if line == '?':
-                print self.do_py.__doc__
+                print(self.do_py.__doc__)
                 return
 
             try:
-                exec line in self._locals, self._globals
-            except Exception, e:
-                print e.__class__, ':', e
+                exec(line in self._locals, self._globals)
+            except Exception as e:
+                print(e.__class__, ':', e)
 
     def default(self, line):
         """Called on an input line when the command prefix is not recognized.
@@ -152,7 +152,7 @@ class AbstractConsole(cmd.Cmd):
     def do_hist(self, args):
         """Print a list of commands that have been entered"""
 
-        print self._hist
+        print(self._hist)
 
     if PureDynagen:
         def do_exit(self, args):
@@ -245,7 +245,7 @@ class confDefaultsConsole(AbstractConsole):
         """set integer type option in config"""
 
         if '?' in args or args.strip() == '':
-            print getattr(self, 'do_' + option).__doc__
+            print(getattr(self, 'do_' + option).__doc__)
             return
 
         argument = self.clean_args(args)
@@ -264,7 +264,7 @@ class confDefaultsConsole(AbstractConsole):
         """set string type option in config"""
 
         if '?' in args or args.strip() == '':
-            print getattr(self, 'do_' + option).__doc__
+            print(getattr(self, 'do_' + option).__doc__)
             return
 
         option_value = self.clean_args(args)
@@ -280,7 +280,7 @@ class confDefaultsConsole(AbstractConsole):
 \tunset the option_value from option. This will effectivelly set the option the the default value."""
 
         if '?' in args or args.strip() == '':
-            print self.do_no.__doc__
+            print(self.do_no.__doc__)
             return
         argument = args.split('=')
         if len(argument) != 2:
@@ -305,7 +305,7 @@ class confDefaultsConsole(AbstractConsole):
 \tset image to <IOS image>"""
 
         if '?' in args or args.strip() == '':
-            print self.do_image.__doc__
+            print(self.do_image.__doc__)
             return
 
         image = self.clean_args(args)
@@ -318,7 +318,7 @@ class confDefaultsConsole(AbstractConsole):
             imagename = os.path.basename(image)
             if self.dynagen.useridledb:
                 if imagename in self.dynagen.useridledb:
-                    print imagename + ' found in user idlepc database\nSetting idlepc value to ' + self.dynagen.useridledb[imagename]
+                    print(imagename + ' found in user idlepc database\nSetting idlepc value to ' + self.dynagen.useridledb[imagename])
                     self.config['idlepc'] = self.dynagen.useridledb[imagename]
             self.dynamips_server.configchange = True
 
@@ -369,7 +369,7 @@ class confDefaultsConsole(AbstractConsole):
 \tenable or disable IOS ghosting"""
 
         if '?' in args or args.strip() == '':
-            print self.do_ghostios.__doc__
+            print(self.do_ghostios.__doc__)
             return
 
         ghostios = self.clean_args(args)
@@ -392,7 +392,7 @@ class confDefaultsConsole(AbstractConsole):
 \tenable or disable JIT blocks sharing"""
 
         if '?' in args or args.strip() == '':
-            print self.do_jitsharing.__doc__
+            print(self.do_jitsharing.__doc__)
             return
 
         jitsharing = self.clean_args(args)
@@ -437,7 +437,7 @@ will use this ghost image"""
 
     def do_slot(self, args):
         if '?' in args or args.strip() == '':
-            print self.do_slot.__doc__
+            print(self.do_slot.__doc__)
             return
         argument = args.split('=')
         if len(argument) == 2:
@@ -690,7 +690,7 @@ class conf7200DefaultsConsole(confDefaultsConsole):
 \tset NPE type. Choose 'npe-100', 'npe-150', 'npe-175', 'npe-200', 'npe-225', 'npe-300' or 'npe-400' """
 
         if '?' in args or args.strip() == '':
-            print self.do_npe.__doc__
+            print(self.do_npe.__doc__)
             return
 
         npe = self.clean_args(args)
@@ -710,7 +710,7 @@ class conf7200DefaultsConsole(confDefaultsConsole):
 \tset midplane type. Choose "std" or "vxr" '''
 
         if '?' in args or args.strip() == '':
-            print self.do_midplane.__doc__
+            print(self.do_midplane.__doc__)
             return
 
         midplane = self.clean_args(args)
@@ -774,7 +774,7 @@ class confRouterConsole(confDefaultsConsole):
 
     def generic_connect(self, interface, args):
         if '?' in args or args.strip() == '':
-            print getattr(self, 'do_' + interface).__doc__
+            print(getattr(self, 'do_' + interface)).__doc__
             return
         self.connect(interface + args)
 
@@ -837,7 +837,7 @@ class confRouterConsole(confDefaultsConsole):
         destination = argument[1].strip()
         try:
             result = self.dynagen.connect(self.router, source, destination)
-        except DynamipsError, e:
+        except DynamipsError as e:
             err = e[0]
             error('Connecting %s %s to %s resulted in:    %s' % (self.router.name, source, destination, err))
             return
@@ -869,7 +869,7 @@ no <option> = <option_value>
 \tunset the option_value from option. This will effectivelly set the option the the default value"""
 
         if '?' in args or args.strip() == '':
-            print self.do_no.__doc__
+            print(self.do_no.__doc__)
             return
 
         #check whether this is a properly formatted "no" command
@@ -894,7 +894,7 @@ no <option> = <option_value>
                 if self.dynagen.running_config[h][r][source].lower() == destination:
                     try:
                         result = self.dynagen.disconnect(self.router, source, dest)
-                    except DynamipsError, e:
+                    except DynamipsError as e:
                         err = e[0]
                         error('Disconnecting %s %s from %s resulted in:    %s' % (self.router.name, source, dest, err))
                         return
@@ -959,7 +959,7 @@ no <option> = <option_value>
                         self.onecmd(lside + '=' + str(getattr(self.router, 'default_' + lside)))
                 else:
                     error('Bad ' + lside + 'value: ' + rside)
-            except ValueError, AttributeError:
+            except ValueError as AttributeError:
                 error('Bad option: ' + lside)
 
     def clean_args(self, args):
@@ -973,7 +973,7 @@ no <option> = <option_value>
         """This method overrides the method in confDefaultsConsole. This is the only functionality difference"""
 
         if '?' in args or args.strip() == '':
-            print getattr(self, 'do_' + option).__doc__
+            print(getattr(self, 'do_' + option)).__doc__
             return
 
         argument = self.clean_args(args)
@@ -982,7 +982,7 @@ no <option> = <option_value>
             if getattr(self.router, option) != option_value:
                 try:
                     setattr(self.router, option, option_value)
-                except DynamipsError, e:
+                except DynamipsError as e:
                     error(e)
         except (TypeError, ValueError):
             error('enter number, not: ' + argument)
@@ -991,7 +991,7 @@ no <option> = <option_value>
         """This method overrides the method in confDefaultsConsole. This is the only functionality difference"""
 
         if '?' in args or args.strip() == '':
-            print getattr(self, 'do_' + option).__doc__
+            print(getattr(self, 'do_' + option)).__doc__
             return
 
         option_value = self.clean_args(args)
@@ -999,7 +999,7 @@ no <option> = <option_value>
             try:
                 setattr(self.router, option, option_value)
                 return [True, option_value]
-            except DynamipsError, e:
+            except DynamipsError as e:
                 error(e)
         else:
             return [False, None]
@@ -1013,7 +1013,7 @@ no <option> = <option_value>
             imagename = os.path.basename(image)
             if self.dynagen.useridledb:
                 if imagename in self.dynagen.useridledb:
-                    print imagename + ' found in user idlepc database\nSetting idlepc value to ' + self.dynagen.useridledb[imagename]
+                    print(imagename + ' found in user idlepc database\nSetting idlepc value to ' + self.dynagen.useridledb[imagename])
                     self.do_idlepc(self.dynagen.useridledb[imagename])
 
     def do_ghostios(self, args):
@@ -1021,7 +1021,7 @@ no <option> = <option_value>
 \tEnable or disable IOS ghosting"""
 
         if '?' in args or args.strip() == '':
-            print self.do_ghostios.__doc__
+            print(self.do_ghostios.__doc__)
             return
 
         ghostios = self.clean_args(args)
@@ -1031,7 +1031,7 @@ no <option> = <option_value>
                 try:
                     self.router.ghost_status = 2
                     self.router.ghost_file = ghost_file
-                except DynamipsError, e:
+                except DynamipsError as e:
                     error(e)
             else:
                 self.router.ghost_status = 3
@@ -1043,7 +1043,7 @@ no <option> = <option_value>
 \tEnable or disable JIT blocks sharing"""
 
         if '?' in args or args.strip() == '':
-            print self.do_jitsharing.__doc__
+            print(self.do_jitsharing.__doc__)
             return
 
         jitsharing = self.clean_args(args)
@@ -1051,14 +1051,14 @@ no <option> = <option_value>
             try:
                 self.dynagen.jitshareddevices[self.router.name] = jitsharing
                 self.dynagen.jitsharing()
-            except DynamipsError, e:
+            except DynamipsError as e:
                 error(e)
         else:
             error('the only possible options are True or False, not: ' + args)
 
     def do_slot(self, args):
         if '?' in args or args.strip() == '':
-            print self.do_slot.__doc__
+            print(self.do_slot.__doc__)
             return
 
         argument = args.split('=')
@@ -1068,7 +1068,7 @@ no <option> = <option_value>
             try:
                 slot_number = int(argument[0])
                 self.dynagen.setproperty(self.router, 'slot' + str(slot_number), slot_type)
-            except (TypeError, ValueError, DynamipsError), e:
+            except (TypeError, ValueError, DynamipsError) as e:
                 error(e)
         else:
             error('incorect syntax: ' + args)
@@ -1268,7 +1268,7 @@ class confFRSWConsole(AbstractConfSWConsole):
                 except AttributeError:
                     error('semantic error in: ' + args)
                     return
-                except DynamipsError, e:
+                except DynamipsError as e:
                     error(e)
                     return
             else:
@@ -1300,10 +1300,10 @@ class confFRSWConsole(AbstractConfSWConsole):
                 except AttributeError:
                     error('semantic error in: ' + args)
                     return
-                except DynamipsError, e:
+                except DynamipsError as e:
                     error(e)
                     return
-                except DynamipsWarning, e:
+                except DynamipsWarning as e:
                     error(e)
                     return
             else:
@@ -1343,7 +1343,7 @@ class confETHSWConsole(AbstractConfSWConsole):
                 error('this mapping does not exist')
         except (IndexError, KeyError):
             error('this mapping does not exist')
-        except DynamipsError, e:
+        except DynamipsError as e:
             error(e)
 
 class confATMBRConsole(AbstractConfSWConsole):
@@ -1378,7 +1378,7 @@ class confATMBRConsole(AbstractConfSWConsole):
                 except AttributeError:
                     error('semantic error in: ' + args)
                     return
-                except DynamipsError, e:
+                except DynamipsError as e:
                     error(e)
                     return
             else:
@@ -1412,10 +1412,10 @@ class confATMBRConsole(AbstractConfSWConsole):
                 except (AttributeError, ValueError):
                     error('semantic error in: ' + args)
                     return
-                except DynamipsError, e:
+                except DynamipsError as e:
                     error(e)
                     return
-                except DynamipsWarning, e:
+                except DynamipsWarning as e:
                     error(e)
                     return
             else:
@@ -1473,7 +1473,7 @@ class confATMSWConsole(AbstractConfSWConsole):
             except AttributeError:
                 error('semantic error in: ' + args)
                 return
-            except DynamipsError, e:
+            except DynamipsError as e:
                 error(e)
                 return
         else:
@@ -1521,10 +1521,10 @@ class confATMSWConsole(AbstractConfSWConsole):
             except AttributeError:
                 error('semantic error in: ' + args)
                 return
-            except DynamipsError, e:
+            except DynamipsError as e:
                 error(e)
                 return
-            except DynamipsWarning, e:
+            except DynamipsWarning as e:
                 error(e)
                 return
         else:
@@ -1803,7 +1803,7 @@ router <new_router_name>
 \tcreate new 7200 router"""
 
         if '?' in args or args.strip() == '':
-            print self.do_router.__doc__
+            print(self.do_router.__doc__)
             return
 
         params = args.split(' ')
@@ -1935,7 +1935,7 @@ router <new_router_name>
         del router
         #delete router from front-end
         del self.dynagen.devices[params[1]]
-        print 'Router ' + params[1] + ' on ' + self.d + ' deleted'
+        print('Router ' + params[1] + ' on ' + self.d + ' deleted')
 
         #update the config
         self.dynagen.update_running_config()
@@ -1968,7 +1968,7 @@ router <new_router_name>
         frsw.delete()
         #delete router from front-end
         del self.dynagen.devices[params[1]]
-        print 'Frame-relay switch ' + params[1] + ' deleted'
+        print('Frame-relay switch ' + params[1] + ' deleted')
         #update the config
         self.dynagen.update_running_config()
 
@@ -2025,7 +2025,7 @@ router <new_router_name>
         atmsw.delete()
         #delete router from front-end
         del self.dynagen.devices[params[1]]
-        print 'ATM switch ' + params[1] + ' deleted'
+        print('ATM switch ' + params[1] + ' deleted')
         #update the config
         self.dynagen.update_running_config()
 
@@ -2056,7 +2056,7 @@ router <new_router_name>
         atmbr.delete()
         #delete router from front-end
         del self.dynagen.devices[params[1]]
-        print 'ATM bridge ' + params[1] + ' deleted'
+        print('ATM bridge ' + params[1] + ' deleted')
         #update the config
         self.dynagen.update_running_config()
 
@@ -2077,7 +2077,7 @@ router <new_router_name>
 
         #delete the defaults section
         del self.dynagen.defaults_config[self.d][params[1]]
-        print 'Defaults section ' + params[1] + ' on ' + self.d + ' deleted'
+        print('Defaults section ' + params[1] + ' on ' + self.d + ' deleted')
 
     def do_no(self, args):
         """no router <router_name>
@@ -2086,7 +2086,7 @@ no defaults <router_model>
 \tdelete the defaults model section, and all routers of this model"""
 
         if '?' in args or args.strip() == '':
-            print self.do_no.__doc__
+            print(self.do_no.__doc__)
             return
 
         #check whether we have proper args
@@ -2120,7 +2120,7 @@ no defaults <router_model>
 \tset the working directory for this hypervisor where all temp file are stored"""
 
         if '?' in args or args.strip() == '':
-            print self.do_workingdir.__doc__
+            print(self.do_workingdir.__doc__)
             return
 
         argument = self.clean_args(args)
@@ -2129,7 +2129,7 @@ no defaults <router_model>
             try:
                 workingdir = '"' + argument + '"'
                 self.dynamips_server.workingdir = workingdir
-            except DynamipsError, e:
+            except DynamipsError as e:
                 error(e)
 
     def do_frsw(self, args):
@@ -2139,7 +2139,7 @@ frsw <new frsw_name>
 \tcreate new frame-relay switch of this name"""
 
         if '?' in args or args.strip() == '':
-            print self.do_frsw.__doc__
+            print(self.do_frsw.__doc__)
             return
         try:
             frsw = self.dynagen.devices[args]
@@ -2170,7 +2170,7 @@ atmsw <new atmsw_name>
 \tcreate new ATM switch of this name"""
 
         if '?' in args or args.strip() == '':
-            print self.do_atmsw.__doc__
+            print(self.do_atmsw.__doc__)
             return
         try:
             atmsw = self.dynagen.devices[args]
@@ -2201,7 +2201,7 @@ atmbr <new atmbr_name>
 \tcreate new ATM Bridge of this name"""
 
         if '?' in args or args.strip() == '':
-            print self.do_atmbr.__doc__
+            print(self.do_atmbr.__doc__)
             return
         try:
             atmbr = self.dynagen.devices[args]
@@ -2225,8 +2225,8 @@ atmbr <new atmbr_name>
                 #and let's jump into the confATMBRConsole
                 nested_cmd = confATMBRConsole(atmbr, self.prompt, self.dynagen)
                 nested_cmd.cmdloop()
-            except DynamipsError, e:
-                print 'dynamips error in creating ATMBR bridge, ' + str(e)
+            except DynamipsError as e:
+                print('dynamips error in creating ATMBR bridge, ' + str(e))
 
     def do_ethsw(self, args):
         """ethsw <ethsw name>
@@ -2235,7 +2235,7 @@ ethsw <new ethsw_name>
 \tcreate new Ethernet switch of this name"""
 
         if '?' in args or args.strip() == '':
-            print self.do_ethsw.__doc__
+            print(self.do_ethsw.__doc__)
             return
         try:
             ethsw = self.dynagen.devices[args]
@@ -2259,8 +2259,8 @@ ethsw <new ethsw_name>
                 #and let's jump into the confethswConsole
                 nested_cmd = confETHSWConsole(ethsw, self.prompt, self.dynagen)
                 nested_cmd.cmdloop()
-            except DynamipsError, e:
-                print 'dynamips error in creating ethsw bridge, ' + str(e)
+            except DynamipsError as e:
+                print('dynamips error in creating ethsw bridge, ' + str(e))
 
 
 class confConsole(AbstractConsole):
@@ -2286,7 +2286,7 @@ class confConsole(AbstractConsole):
 
     def set_option(self, option, type, args):
         if '?' in args or args.strip() == '':
-            print getattr(self, 'do_' + option).__doc__
+            print(getattr(self, 'do_' + option)).__doc__
             return
 
         argument = self.clean_args(args)
@@ -2357,7 +2357,7 @@ class confConsole(AbstractConsole):
 \tunset the option_value from option. This will effectivelly set the option the the default value."""
 
         if '?' in args or args.strip() == '':
-            print self.do_no.__doc__
+            print(self.do_no.__doc__)
             return
 
         #check whether this is a properly formatted 'no' command

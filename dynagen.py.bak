@@ -1049,11 +1049,11 @@ class Dynagen:
                 h.close()
                 try:
                     config = ConfigObj(FILENAME, configspec=configspec, raise_errors=True, list_values=False, encoding='utf-8')
-                except SyntaxError as e:
-                    print('\nError in loading .net file:')
-                    print(e)
-                    print(e.line, '\n')
-                    input('Press ENTER to continue')
+                except SyntaxError, e:
+                    print '\nError in loading .net file:'
+                    print e
+                    print e.line, '\n'
+                    raw_input('Press ENTER to continue')
                     sys.exit(1)
             except IOError:
 
@@ -1075,8 +1075,8 @@ class Dynagen:
                 section_string = (', ').join(section_list)
                 if error == False:
                     error = 'Missing value or section.'
-                print(section_string, ' = ', error)
-            input('Press ENTER to continue')
+                print section_string, ' = ', error
+            raw_input('Press ENTER to continue')
             sys.exit(1)
 
         return config
@@ -1639,7 +1639,7 @@ class Dynagen:
                             if dev.image == None:
                                 self.dowarning('router ' + dev.name + ' does not have IOS image name set' )
                                 self.import_error = True
-                    except DynamipsError as e :
+                    except DynamipsError,e :
                         err = e[0]
                         self.dowarning('received dynamips server error:\n\t%s' % err)
                         self.import_error = True
@@ -1665,12 +1665,12 @@ class Dynagen:
             (router, source, dest) = connection
             try:
                 result = self.connect(router, source, dest)
-            except DynamipsError as e:
+            except DynamipsError, e:
                 err = e[0]
                 self.dowarning('Connecting %s %s to %s resulted in:\n\t%s' % (router.name, source, dest, err))
                 self.import_error = True
                 continue
-            except DynamipsWarning as e:
+            except DynamipsWarning, e:
                 err = e[0]
                 self.dowarning('Connecting %s %s to %s resulted in:\n\t%s' % (router.name, source, dest, err))
                 continue
@@ -1684,7 +1684,7 @@ class Dynagen:
             (switch, source, dest) = mapping
             try:
                 self.switch_map(switch, source, dest)
-            except DynamipsError as e:
+            except DynamipsError, e:
                 err = e[0]
                 self.dowarning('Connecting %s %s to %s resulted in:\n\t%s' % (switch.name, source, dest, err))
                 self.import_error = True
@@ -1703,15 +1703,15 @@ class Dynagen:
             (porttype, vlan) = dest.split()
             try:
                 switch.set_port(int(source), porttype, int(vlan))
-            except DynamipsError as e:
+            except DynamipsError, e:
                 self.dowarning('Connecting %s port %s to %s resulted in:\n\t%s' % (switch.name, source, dest, e))
                 self.import_error = True
                 return
-            except AttributeError as e:
+            except AttributeError, e:
                 self.dowarning('Connecting %s port %s to %s resulted in:\n\t%s' % (switch.name, source, dest, e))
                 self.import_error = True
                 return
-            except DynamipsWarning as e:
+            except DynamipsWarning, e:
                 self.dowarning('Connecting %s port %s to %s resulted in:\n\t%s' % (switch.name, source, dest, e))
                 # Now silently ignoring unused switchports
                 # self.import_error = True
@@ -1759,7 +1759,7 @@ class Dynagen:
                     self.dowarning('Connecting %s %s to %s resulted in:\n\t%s' % (switch.name, source, dest, e))
                     self.import_error = True
                     return
-            except DynamipsError as e:
+            except DynamipsError, e:
                 self.dowarning('Connecting %s port %s to %s resulted in:\n\t%s' % (switch.name, source, dest, e))
                 self.import_error = True
                 return
@@ -1775,7 +1775,7 @@ class Dynagen:
                     self.import_error = True
                 #handle the port setting on the switch
                 self.ethsw_map(switch, source, porttype + ' ' + vlan)
-            except DynamipsError as e:
+            except DynamipsError, e:
                 err = e[0]
                 self.dowarning('Connecting %s %s to %s resulted in:\n\t%s' % (switch.name, source, dest, err))
                 self.import_error = True
@@ -1828,7 +1828,7 @@ class Dynagen:
                 self.dowarning('Connecting %s %s to %s resulted in:\n\t%s' % (hub.name, source, dest, e))
                 self.import_error = True
                 return
-        except DynamipsError as e:
+        except DynamipsError, e:
             self.dowarning('Connecting %s port %s to %s resulted in:\n\t%s' % (hub.name, source, dest, e))
             self.import_error = True
             return
@@ -1857,11 +1857,11 @@ class Dynagen:
 
         try:
             config = ConfigObj(inifile, list_values=False, raise_errors=True, encoding='utf-8')
-        except SyntaxError as e:
-            print('\nError:')
-            print(e)
-            print(e.line, '\n')
-            input('Press ENTER to continue')
+        except SyntaxError, e:
+            print '\nError:'
+            print e
+            print e.line, '\n'
+            raw_input('Press ENTER to continue')
             sys.exit(1)
 
         try:
@@ -1937,11 +1937,11 @@ class Dynagen:
 
         try:
             config = ConfigObj(inifile, list_values=False, raise_errors=True, encoding='utf-8')
-        except SyntaxError as e:
-            print('\nError in user idlepc database:')
-            print(e)
-            print(e.line, '\n')
-            input('Press ENTER to continue')
+        except SyntaxError, e:
+            print '\nError in user idlepc database:'
+            print e
+            print e.line, '\n'
+            raw_input('Press ENTER to continue')
             self.handled = True
             sys.exit(1)
 
@@ -1952,7 +1952,7 @@ class Dynagen:
 
 
         if self.configurations != {}:
-            result = input('There are saved configurations in your network file. \nDo you wish to import them (Y/N)? ')
+            result = raw_input('There are saved configurations in your network file. \nDo you wish to import them (Y/N)? ')
             if result.lower() == 'y':
                 for router_name in self.configurations:
                     device = self.devices[router_name]
@@ -2016,7 +2016,7 @@ class Dynagen:
                     device.ghost_status = 2
                     device.ghost_file = ghost_instance
 
-        except DynamipsError as e:
+        except DynamipsError, e:
             self.doerror(e)
 
     def jitsharing(self):
@@ -2071,7 +2071,7 @@ class Dynagen:
                                 #print "Unable to activate JIT sharing group, please consider deactivating JIT sharing"
                                 break
 
-        except DynamipsError as e:
+        except DynamipsError, e:
             self.doerror(e)
 
     def apply_idlepc(self):
@@ -2100,7 +2100,7 @@ class Dynagen:
                         if device.idlepc == None:
                             self.dowarning('Starting %s with no idle-pc value' % device.name)
                         device.start()
-                    except DynamipsError as e:
+                    except DynamipsError, e:
                         # Strip leading error code if present
                         e = str(e)
                         if e[3] == '-':
@@ -2329,18 +2329,18 @@ class Dynagen:
 
         # save also active configuration on the router. Do this only when "copy run start" or similar command issued. This will not be visible in show run, only in startup config
         if need_active_config:
-            print('extracting config from router ' + router.name + '....')
+            print 'extracting config from router ' + router.name + '....'
             try:
                 config = router.config_b64
                 if config != None:
                     self.running_config[h][r]['configuration'] = config
-                    print('config extracted from router ' + router.name)
+                    print 'config extracted from router ' + router.name
             except AttributeError:
                 pass
-            except DynamipsError as e:
-                print(e)
-            except DynamipsWarning as e:
-                print("Note: " + str(e))
+            except DynamipsError, e:
+                print e
+            except DynamipsWarning, e:
+                print "Note: " + str(e)
 
         #go through adapters on this router and creare running config for each
         for adapter in router.slot:
@@ -2499,28 +2499,28 @@ class Dynagen:
                 #print "ADEBUG: dynagen.py: hypervisor_name = ", hypervisor_name
                 if isinstance(device, Router):
                     device_section = self.running_config[hypervisor_name]['ROUTER ' + device.name]
-                    print('\t' + '[[ROUTER ' + device.name + ']]')
+                    print '\t' + '[[ROUTER ' + device.name + ']]'
                 elif isinstance(device, AnyEmuDevice):
                     device_section = self.running_config['qemu '+hypervisor_name]['%s %s' % (device.basehostname, device.name)]
-                    print('\t' + '[[QEMU ' + device.name + ']]')
+                    print '\t' + '[[QEMU ' + device.name + ']]'
                 elif isinstance(device, AnyVBoxEmuDevice):
                     device_section = self.running_config['vbox '+hypervisor_name]['%s %s' % (device.basehostname, device.name)]
-                    print('\t' + '[[VBOX ' + device.name + ']]')
+                    print '\t' + '[[VBOX ' + device.name + ']]'
                 elif isinstance(device, FRSW):
                     device_section = self.running_config[hypervisor_name]['FRSW ' + device.name]
-                    print('\t' + '[[FRSW ' + device.name + ']]')
+                    print '\t' + '[[FRSW ' + device.name + ']]'
                 elif isinstance(device, ETHSW):
                     device_section = self.running_config[hypervisor_name]['ETHSW ' + device.name]
-                    print('\t' + '[[ETHSW ' + device.name + ']]')
+                    print '\t' + '[[ETHSW ' + device.name + ']]'
                 elif isinstance(device, Hub):
                     device_section = self.running_config[hypervisor_name]['Hub ' + device.name]
-                    print('\t' + '[[Hub ' + device.name + ']]')
+                    print '\t' + '[[Hub ' + device.name + ']]'
                 elif isinstance(device, ATMSW):
                     device_section = self.running_config[hypervisor_name]['ATMSW ' + device.name]
-                    print('\t' + '[[ATMSW ' + device.name + ']]')
+                    print '\t' + '[[ATMSW ' + device.name + ']]'
                 elif isinstance(device, ATMBR):
                     device_section = self.running_config[hypervisor_name]['ATMBR ' + device.name]
-                    print('\t' + '[[ATMBR ' + device.name + ']]')
+                    print '\t' + '[[ATMBR ' + device.name + ']]'
                 #print out the device config
                 device_section_tuple = self.running_config.write(section=device_section)
                 return device_section_tuple
@@ -2594,17 +2594,17 @@ class Dynagen:
                     linktype = linktype.upper()
                     linktype = linkTransform[linktype]
                 except KeyError:
-                    print('Invalid linktype: ' + linktype)
+                    print 'Invalid linktype: ' + linktype
                     return
             else:
                 (device, interface, filename) = args.split(None, 2)
                 linktype = None
         except ValueError:
-            print ('Invalid syntax')
+            print  'Invalid syntax'
             return
 
         if device not in self.devices:
-            print('Unknown device: ' + device)
+            print 'Unknown device: ' + device
             return
         device = self.devices[device]
 
@@ -2622,10 +2622,10 @@ class Dynagen:
                         ]:
                         linktype = 'EN10MB'
                     elif inttype.lower() in ['s', 'se']:
-                        print('Error: Link type must be specified for serial interfaces')
+                        print 'Error: Link type must be specified for serial interfaces'
                         return
                     else:
-                        print('Error: Packet capture is not supported on this interface type')
+                        print 'Error: Packet capture is not supported on this interface type'
                         return
                 pa = pa[0]
                 # Apply the filter
@@ -2644,27 +2644,27 @@ class Dynagen:
                        filename,
                    )
             else:
-                print(device.name + " does not support interface capturing")
-        except DynamipsError as e:
-            print(e)
+                print device.name + " does not support interface capturing"
+        except DynamipsError, e:
+            print e
             return
-        except DynamipsWarning as e:
-            print("Note: " + str(e))
+        except DynamipsWarning, e:
+            print "Note: " + str(e)
         except IndexError:
-            print('Error: No such interface %s on device %s' % (interface, device))
+            print 'Error: No such interface %s on device %s' % (interface, device)
             return
         except AttributeError:
-            print('Error: Interface %s on device %s is not connected' % (interface, device))
+            print 'Error: Interface %s on device %s is not connected' % (interface, device)
             return
 
     def no_capture(self, options):
         if len(options.split()) == 2:
             (device, interface) = options.split(None, 1)
         else:
-            print("Invalid syntax")
+            print "Invalid syntax"
 
         if device not in self.devices:
-            print('Unknown device: ' + device)
+            print 'Unknown device: ' + device
             return
         device = self.devices[device]
 
@@ -2677,13 +2677,13 @@ class Dynagen:
                 device.slot[slot].filter(pa, port, 'none', 'both')
             elif isinstance (device, Emulated_switch):
                 device.filter(port, 'none', 'both')
-        except DynamipsError as e:
-            print(e)
+        except DynamipsError, e:
+            print e
             return
-        except DynamipsWarning as e:
-            print("Note: " + str(e))
+        except DynamipsWarning, e:
+            print "Note: " + str(e)
         except IndexError:
-            print('No such interface %s on device %s' % (pa, device))
+            print 'No such interface %s on device %s' % (pa, device)
             return
 
 
@@ -2712,21 +2712,21 @@ class Dynagen:
 
         # Level 3, dynagen debugs.
         if self.debuglevel >= 3:
-            print('  DEBUG: ' + unicode(string))
+            print '  DEBUG: ' + unicode(string)
 
     def doerror(self, msg):
         """Print out an error message"""
 
-        print('\n*** Error: ', unicode(msg))
+        print '\n*** Error: ', unicode(msg)
         self.doreset()
         if not options.qa:
-            input('Press ENTER to continue')
+            raw_input('Press ENTER to continue')
         sys.exit(1)
 
     def dowarning(self, msg):
         """Print out minor warning messages"""
 
-        print('*** Warning: ', unicode(msg))
+        print '*** Warning: ', unicode(msg)
 
     def doreset(self):
         """reset all hypervisors"""
@@ -2774,7 +2774,7 @@ if __name__ == '__main__':
 
         if options.debug:
             setdebug(True)
-            print('\nPython version: %s' % sys.version)
+            print '\nPython version: %s' % sys.version
         if options.nosend:
             nosend(True)
             nosend_qemu(True)
@@ -2789,7 +2789,7 @@ if __name__ == '__main__':
         # Import INI file
         try:
             dynagen.import_ini(INIFILE)
-        except DynamipsError as e:
+        except DynamipsError, e:
             dynagen.doerror(e)
 
         if len(args) == 0:
@@ -2805,29 +2805,29 @@ if __name__ == '__main__':
                 dynagen.doerror('Could not open file: ' + FILENAME)
 
             if options.qa:
-                print(80*"*")
-                print("Checking NET file " + FILENAME)
+                print 80*"*"
+                print "Checking NET file " + FILENAME
             else:
-                print("Reading configuration file...\n")
+                print "Reading configuration file...\n"
             try:
                 dynagen.import_config(FILENAME)
-            except DynamipsError as e:
+            except DynamipsError, e:
                 # Strip leading error code if present
                 e = str(e)
                 if e[3] == '-':
                     # Are the first three characters an error code?
                     try:
                         if e[:3] == str(int(e[:3])):
-                            print('\nReading configuration file...\n')
+                            print '\nReading configuration file...\n'
                     except ValueError:
                         pass
 
                 dynagen.doerror(e)
-            except DynamipsWarning as e:
+            except DynamipsWarning, e:
                 dynagen.dowarning(e)
                 dynagen.doreset()
                 if not options.qa:
-                    input('Press ENTER to continue')
+                    raw_input('Press ENTER to continue')
                 sys.exit(1)
 
 
@@ -2838,7 +2838,7 @@ if __name__ == '__main__':
             dynagen.apply_idlepc()
             dynagen.autostart_instances()
 
-            print('Network successfully loaded\n')
+            print 'Network successfully loaded\n'
 
             #set the default_working dir
             realpath = os.path.realpath(FILENAME)
@@ -2852,12 +2852,12 @@ if __name__ == '__main__':
             try:
                 console.cmdloop()
             except KeyboardInterrupt:
-                print('Exiting...')
+                print 'Exiting...'
 
             dynagen.doreset()
     except DynamipsErrorHandled:
         if not options.qa:
-            input('Press ENTER to exit')
+            raw_input('Press ENTER to exit')
         sys.exit(1)
     except SystemExit:
         sys.exit(1)
@@ -2865,13 +2865,13 @@ if __name__ == '__main__':
         (exctype, value, trace) = sys.exc_info()
 
         # Display the unhandled exception, and pause so it can be observed
-        print("""*** Dynagen has crashed ****
+        print """*** Dynagen has crashed ****
 Please open a bug report against Dynagen at http://7200emu.hacki.at
 Include a description of what you were doing when the error occured, your
 network file, also any errors output by dynamips hypervisor, and the following traceback data:
-                  """)
+                  """
 
         traceback.print_exc()
         if not options.qa:
-            input('Press ENTER to exit')
+            raw_input('Press ENTER to exit')
         sys.exit(1)

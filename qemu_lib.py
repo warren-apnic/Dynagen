@@ -40,19 +40,19 @@ if debuglevel > 0:
         dfile = open(debugfilename, 'wb')
     except:
         dfile = 0
-        print "WARNING: log file cannot be created !"
+        print("WARNING: log file cannot be created !")
     if dfile:
-        print "Log file = %s" % str(debugfilename)
+        print("Log file = %s" % str(debugfilename))
 
 def debugmsg(level, message):
     if debuglevel == 0:
         return
     if debuglevel >= level:
-        print message
+        print(message)
         if dfile:
-            #In python 2.6, print with redirections always uses UNIX line-ending,
+            #In python 2.6, print(with redirections always uses UNIX line-ending,)
             # so I must add os-neutral line-endings.
-            print >> dfile, message,
+            print(message, file=dfile)
             dfile.write(os.linesep)
             dfile.flush()
 
@@ -131,7 +131,7 @@ class Qemu(object):
             try:
                 self.s = socket.create_connection((self.host, self.port), timeout)
             except:
-                raise DynamipsError, 'Could not connect to qemuwrapper at %s:%i' % (self.host, self.port)
+                raise DynamipsError('Could not connect to qemuwrapper at %s:%i' % (self.host, self.port))
         #version checking
         try:
             version = send(self, 'qemuwrapper version')[0][4:]
@@ -149,11 +149,11 @@ class Qemu(object):
                 rcver = .999
             intver = int(major) * 10000 + int(minor) * 100 + int(sub) + rcver
         except:
-            #print 'Warning: problem determing qemuwrapper server version on host: %s. Skipping version check' % self.host
+            #print('Warning: problem determing qemuwrapper server version on host: %s. Skipping version check' % self.host)
             intver = 999999
 
         if intver < INTVER:
-            raise DynamipsVerError, 'This version of Dynagen requires at least version %s of qemuwrapper. \n Server %s is runnning version %s.' % (STRVER, self.host, version)
+            raise DynamipsVerError('This version of Dynagen requires at least version %s of qemuwrapper. \n Server %s is runnning version %s.' % (STRVER, self.host, version))
         self._version = version
 
         #all other needed variables
@@ -222,7 +222,7 @@ class Qemu(object):
         debugmsg(2, "Qemu::_setqemupath(%s)" % unicode(qemupath))
 
         if type(qemupath) not in [str, unicode]:
-            raise DynamipsError, 'invalid Qemu path'
+            raise DynamipsError('invalid Qemu path')
         # send to qemuwrapper encased in quotes to protect spaces
         send(self, 'qemuwrapper qemu_path %s' % '"' + qemupath.replace('\\', '/') + '"')
         self._qemupath = qemupath
@@ -243,7 +243,7 @@ class Qemu(object):
         debugmsg(2, "Qemu::_setqemuimgpath(%s)" % unicode(qemuimgpath))
 
         if type(qemuimgpath) not in [str, unicode]:
-            raise DynamipsError, 'invalid Qemu-img path'
+            raise DynamipsError('invalid Qemu-img path')
         # send to qemuwrapper encased in quotes to protect spaces
         send(self, 'qemuwrapper qemu_img_path %s' % '"' + qemuimgpath.replace('\\', '/') + '"')
         self._qemuimgpath = qemuimgpath
@@ -267,7 +267,7 @@ class Qemu(object):
             return
 
         if type(directory) not in [str, unicode]:
-            raise DynamipsError, 'invalid directory'
+            raise DynamipsError('invalid directory')
         # send to qemuwrapper encased in quotes to protect spaces
         send(self, 'qemuwrapper working_dir %s' % '"' + directory.replace('\\', '/') + '"')
         self._workingdir = directory
@@ -375,7 +375,7 @@ class AnyEmuDevice(object):
         debugmsg(2, "AnyEmuDevice::start()")
 
         if self.state == 'running':
-            raise DynamipsWarning, 'emulated device %s is already running' % self.name
+            raise DynamipsWarning('emulated device %s is already running' % self.name)
 
         r = send(self.p, 'qemu start %s' % self.name)
         self.state = 'running'
@@ -391,7 +391,7 @@ class AnyEmuDevice(object):
         debugmsg(2, "AnyEmuDevice::stop()")
 
         if self.state == 'stopped':
-            raise DynamipsWarning, 'emulated device %s is already stopped' % self.name
+            raise DynamipsWarning('emulated device %s is already stopped' % self.name)
         r = send(self.p, 'qemu stop %s' % self.name)
         self.state = 'stopped'
 
@@ -428,9 +428,9 @@ class AnyEmuDevice(object):
         debugmsg(2, "AnyEmuDevice::suspend()")
 
         if self.state == 'suspended':
-            raise DynamipsWarning, 'virtualized device %s is already suspended' % self.name
+            raise DynamipsWarning('virtualized device %s is already suspended' % self.name)
         if self.state == 'stopped':
-            raise DynamipsWarning, 'virtualized device %s is not running' % self.name
+            raise DynamipsWarning('virtualized device %s is not running' % self.name)
 
         r = self.qmonitor('stop')
         self.state = 'suspended'
@@ -443,9 +443,9 @@ class AnyEmuDevice(object):
         debugmsg(2, "AnyEmuDevice::resume()")
 
         if self.state == 'running':
-            raise DynamipsWarning, 'virtualized device %s is already running' % self.name
+            raise DynamipsWarning('virtualized device %s is already running' % self.name)
         if self.state == 'stopped':
-            raise DynamipsWarning, 'virtualized device %s is stopped and cannot be resumed' % self.name
+            raise DynamipsWarning('virtualized device %s is stopped and cannot be resumed' % self.name)
 
         r = self.qmonitor('cont')
         self.state = 'running'
@@ -492,7 +492,7 @@ class AnyEmuDevice(object):
         debugmsg(2, "AnyEmuDevice::_setusermod(%s)" % str(usermod))
 
         if type(usermod) != bool:
-            raise DynamipsError, 'invalid usermod option'
+            raise DynamipsError('invalid usermod option')
 
         send(self.p, 'qemu setattr %s usermod %s' % (self.name, str(usermod)))
         self._usermod = usermod
@@ -511,13 +511,13 @@ class AnyEmuDevice(object):
         debugmsg(2, "AnyEmuDevice::_setconsole(%s)" % str(console))
 
         if type(console) != int or console < 1 or console > 65535:
-            raise DynamipsError, 'invalid console port'
+            raise DynamipsError('invalid console port')
 
         if console == self._console:
             return
 
         if not self.track.tcpPortIsFree(self.p.host, console):
-            raise DynamipsError, 'console port %i is already in use' % console
+            raise DynamipsError('console port %i is already in use' % console)
 
         send(self.p, 'qemu setattr %s console %i' % (self.name, console))
         self.track.setTcpPort(self.p.host, console)
@@ -540,7 +540,7 @@ class AnyEmuDevice(object):
         debugmsg(2, "AnyEmuDevice::_setram(%s)" % str(ram))
 
         if type(ram) != int or ram < 1:
-            raise DynamipsError, 'invalid ram size'
+            raise DynamipsError('invalid ram size')
 
         send(self.p, 'qemu setattr %s ram %i' % (self.name, ram))
         self._ram = ram
@@ -561,7 +561,7 @@ class AnyEmuDevice(object):
         debugmsg(2, "AnyEmuDevice::_setnics(%s)" % str(nics))
 
         if type(nics) != int:
-            raise DynamipsError, 'invalid nics number'
+            raise DynamipsError('invalid nics number')
 
         send(self.p, 'qemu setattr %s nics %s' % (self.name, str(nics)))
         self._nics = nics
@@ -589,7 +589,7 @@ class AnyEmuDevice(object):
         debugmsg(2, "AnyEmuDevice::_setnetcard(%s)" % str(netcard))
 
         if type(netcard) not in [str, unicode]:
-            raise DynamipsError, 'invalid netcard'
+            raise DynamipsError('invalid netcard')
 
         send(self.p, 'qemu setattr %s netcard %s' % (self.name, netcard))
         self._netcard = netcard
@@ -610,7 +610,7 @@ class AnyEmuDevice(object):
         debugmsg(2, "AnyEmuDevice::_setkvm(%s)" % str(kvm))
 
         if type(kvm) != bool:
-            raise DynamipsError, 'invalid kvm option'
+            raise DynamipsError('invalid kvm option')
 
         send(self.p, 'qemu setattr %s kvm %s' % (self.name, str(kvm)))
         self._kvm = kvm
@@ -631,7 +631,7 @@ class AnyEmuDevice(object):
         debugmsg(2, "AnyEmuDevice::_setmonitor(%s)" % str(monitor))
 
         if type(monitor) != bool:
-            raise DynamipsError, 'invalid monitor option'
+            raise DynamipsError('invalid monitor option')
 
         send(self.p, 'qemu setattr %s monitor %s' % (self.name, str(monitor)))
         self._monitor = monitor
@@ -652,7 +652,7 @@ class AnyEmuDevice(object):
         debugmsg(2, "AnyEmuDevice::_setoptions(%s)" % str(options))
 
         if type(options) not in [str, unicode]:
-            raise DynamipsError, 'invalid options'
+            raise DynamipsError('invalid options')
 
         #send the options enclosed in quotes to protect them
         send(self.p, 'qemu setattr %s options %s' % (self.name, '"' + options.replace('"', '\\"') + '"'))
@@ -674,7 +674,7 @@ class AnyEmuDevice(object):
         debugmsg(2, "AnyEmuDevice::_setimage(%s)" % unicode(image))
 
         if type(image) not in [str, unicode]:
-            raise DynamipsError, 'invalid image'
+            raise DynamipsError('invalid image')
 
         # Can't verify existance of image because path is relative to backend
         #send the image filename enclosed in quotes to protect it
@@ -751,7 +751,7 @@ class AnyEmuDevice(object):
             try:
                 dst_port = remote_slot.interfaces[remote_int][remote_port]
             except KeyError:
-                raise DynamipsError, 'invalid interface'
+                raise DynamipsError('invalid interface')
 
         #validate the connection
         if not validate_connect('e', remote_int, self.p, self, local_port, dynamips, remote_slot, remote_port):
@@ -997,7 +997,7 @@ class IDS(AnyEmuDevice):
         """
 
         if type(image) not in [str, unicode]:
-            raise DynamipsError, 'invalid image'
+            raise DynamipsError('invalid image')
 
         # Can't verify existance of image because path is relative to backend
         #send the image filename enclosed in quotes to protect it
@@ -1018,7 +1018,7 @@ class IDS(AnyEmuDevice):
         """
 
         if type(image) not in [str, unicode]:
-            raise DynamipsError, 'invalid image'
+            raise DynamipsError('invalid image')
 
         # Can't verify existance of image because path is relative to backend
         #send the image filename enclosed in quotes to protect it
@@ -1070,7 +1070,7 @@ class ASA(AnyEmuDevice):
         """
 
         if type(initrd) not in [str, unicode]:
-            raise DynamipsError, 'invalid initrd'
+            raise DynamipsError('invalid initrd')
 
         # Can't verify existance of image because path is relative to backend
         #send the initrd filename enclosed in quotes to protect it
@@ -1091,7 +1091,7 @@ class ASA(AnyEmuDevice):
         """
 
         if type(kernel) not in [str, unicode]:
-            raise DynamipsError, 'invalid kernel'
+            raise DynamipsError('invalid kernel')
 
         # Can't verify existance of image because path is relative to backend
         #send the kernel filename enclosed in quotes to protect it
@@ -1112,7 +1112,7 @@ class ASA(AnyEmuDevice):
         """
 
         if type(kernel_cmdline) not in [str, unicode]:
-            raise DynamipsError, 'invalid kernel command line'
+            raise DynamipsError('invalid kernel command line')
 
         #send the kernel command line enclosed in quotes to protect it
         send(self.p, 'qemu setattr %s kernel_cmdline %s' % (self.name, '"' + kernel_cmdline.replace('"', '\\"') + '"'))
@@ -1151,7 +1151,7 @@ class PIX(AnyEmuDevice):
         """
 
         if type(serial) not in [str, unicode]:
-            raise DynamipsError, 'invalid serial'
+            raise DynamipsError('invalid serial')
         #TODO verify serial
         if serial:
             send(self.p, 'qemu setattr %s serial %s' % (self.name, serial))
@@ -1171,7 +1171,7 @@ class PIX(AnyEmuDevice):
         """
 
         if type(key) not in [str, unicode]:
-            raise DynamipsError, 'invalid key'
+            raise DynamipsError('invalid key')
         #TODO verify key
         if key:
             send(self.p, 'qemu setattr %s key %s' % (self.name, key))
@@ -1215,7 +1215,7 @@ class AWP(AnyEmuDevice):
         """
 
         if type(initrd) not in [str, unicode]:
-            raise DynamipsError, 'invalid initrd'
+            raise DynamipsError('invalid initrd')
 
         # Can't verify existance of image because path is relative to backend
         #send the initrd filename enclosed in quotes to protect it
@@ -1236,7 +1236,7 @@ class AWP(AnyEmuDevice):
         """
 
         if type(kernel) not in [str, unicode]:
-            raise DynamipsError, 'invalid kernel'
+            raise DynamipsError('invalid kernel')
 
         # Can't verify existance of image because path is relative to backend
         #send the kernel filename enclosed in quotes to protect it
@@ -1257,7 +1257,7 @@ class AWP(AnyEmuDevice):
         """
 
         if type(kernel_cmdline) not in [str, unicode]:
-            raise DynamipsError, 'invalid kernel command line'
+            raise DynamipsError('invalid kernel command line')
 
         #send the kernel command line enclosed in quotes to protect it
         send(self.p, 'qemu setattr %s kernel_cmdline %s' % (self.name, '"' + kernel_cmdline.replace('"', '\\"') + '"'))

@@ -26,7 +26,8 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 import os
 import time
-import StringIO
+#import StringIO
+import io
 import csv
 import base64
 import sys
@@ -114,20 +115,20 @@ class Console(AbstractConsole):
         """
         if (seconds > 0):
             if PureDynagen:
-                print 'Delaying start of %s (%d secs): ' % (device, seconds),
+                print('Delaying start of %s (%d secs): ' % (device, seconds),)
                 width = 40      # Width of progress bar in characters
                 interval = float(seconds)/width
                 prog = progressBar(0, seconds, width)
                 i=0
-                print str(prog),
-                sys.stdout.flush()
+                print(str(prog),
+                sys.stdout.flush())
                 while i < seconds:
                     time.sleep(interval)
                     i += interval
                     prog.updateAmount(i)
-                    print width*'\b' + str(prog),
-                    sys.stdout.flush()
-                print '\r\033[K\r',   
+                    print(width*'\b' + str(prog),
+                    sys.stdout.flush())
+                print('\r\033[K\r',   )
             else:
                 time.sleep(seconds)
 
@@ -138,21 +139,21 @@ class Console(AbstractConsole):
 
         parms = args.split()
         if ('?' in parms) or ('/?' in parms):
-            print self.do_list.__doc__
+            print(self.do_list.__doc__)
             return
 
         patt = None
         if (len(parms) >= 1):
             patt = re.compile('.*' + parms[0] + '.*', re.IGNORECASE)
         table = []
-        print '%-10s %-10s %-10s %-20s %-10s %-10s' % (
+        print('%-10s %-10s %-10s %-20s %-10s %-10s' % (
             'Name',
             'Type',
             'State',
             'Server',
             'Console',
             'AUX'
-            )
+            ))
         for device in self.dynagen.devices.values():
             row = []
             row.append('%-10s' % device.name)
@@ -188,9 +189,9 @@ class Console(AbstractConsole):
             txt = ' '.join(line)
             try:
                 if patt.match(txt):
-                    print txt
+                    print(txt)
             except AttributeError:
-                print txt
+                print(txt)
 
     if PureDynagen:
         def do_conf(self, args):
@@ -200,7 +201,7 @@ class Console(AbstractConsole):
     \tswitch into global config mode"""
 
             if '?' in args:
-                print self.do_conf.__doc__
+                print(self.do_conf.__doc__)
                 return
 
             #if this is a conf <nothing> command go into global config mode
@@ -250,7 +251,7 @@ class Console(AbstractConsole):
 \tsuspend all or a specific router(s)"""
 
         if '?' in args or args.strip() == "":
-            print self.do_suspend.__doc__
+            print(self.do_suspend.__doc__)
             return
 
         devices = args.split()
@@ -258,29 +259,29 @@ class Console(AbstractConsole):
             for device in self.dynagen.devices.values():
                 try:
                     for line in device.suspend():
-                        print line.strip()
+                        print(line.strip())
                 except IndexError:
                     pass
                 except AttributeError:
                     # If this device doesn't support suspend just ignore it
                     pass
-                except DynamipsError, e:
+                except DynamipsError as e:
                     error(e)
-                except DynamipsWarning, e:
-                    print "Note: " + str(e)
+                except DynamipsWarning as e:
+                    print("Note: " + str(e))
             return
 
         for device in devices:
             try:
-                print self.dynagen.devices[device].suspend()[0].strip()
+                print(self.dynagen.devices[device].suspend()[0].strip())
             except IndexError:
                 pass
             except (KeyError, AttributeError):
                 error('invalid device: ' + device)
-            except DynamipsError, e:
+            except DynamipsError as e:
                 error(e)
-            except DynamipsWarning, e:
-                print "Note: " + str(e)
+            except DynamipsWarning as e:
+                print("Note: " + str(e))
 
     def do_qmonitor(self, args):
         """ Send the command to qemu monitor mode
@@ -298,14 +299,14 @@ class Console(AbstractConsole):
         result = device.qmonitor(" ".join(args.split(" ")[1:]))
         # remove the enclosing '[100-' and ']'
         result = result[6:-2]
-        print result
+        print(result)
 
     def do_vboxexec(self, args):
         """vboxexec <VBOX device> <command>\nVirtualBox GuestControl execute sends a command to VirtualBox guest and prints it's output (experimental feature).
 This requires VirtualBox Guest Additions to be installed inside the guest VM."""
 
         if '?' in args or args.strip() == "":
-            print self.do_vboxexec.__doc__
+            print(self.do_vboxexec.__doc__)
             return
         devices = args.split()
 
@@ -323,21 +324,21 @@ This requires VirtualBox Guest Additions to be installed inside the guest VM."""
             #If we got incorrect result, just drop it.
             try:
                 if not result[0][0:10] == "100-result":
-                    #print "ADEBUG: console.py: result[0][0:9] = %s" % result[0][0:9]
+                    #print("ADEBUG: console.py: result[0][0:9] = %s" % result[0][0:9])
                     return
             except:
                 return
             # vboxwrapper TCP server incorrectly formats text by adding double
             #line-ending in UNIX style, which we convert to single line-end in client-native style
-            print result[0][10:].replace('\n\n', os.linesep)
+            print(result[0][10:].replace('\n\n', os.linesep))
         except IndexError:
             pass
         except (KeyError, AttributeError):
             error('invalid device: ' + devname)
-        except DynamipsError, e:
+        except DynamipsError as e:
             error(e)
-        except DynamipsWarning, e:
-            print "Note: " + str(e)
+        except DynamipsWarning as e:
+            print("Note: " + str(e))
 
 
     def do_start(self, args):
@@ -399,7 +400,7 @@ This requires VirtualBox Guest Additions to be installed inside the guest VM."""
 
         # Do help
         if (strthelp) or (len(strtnames) == 0):
-            print self.do_start.__doc__
+            print(self.do_start.__doc__)
             return
 
         # Start empty dictionary. Sintax: { ipserver|'dummy': [device1, device2, ..., deviceN] }
@@ -415,12 +416,12 @@ This requires VirtualBox Guest Additions to be installed inside the guest VM."""
                 if (tmpdev.state == 'stopped'):
                     strtdict[tmpdev.dynamips.host if (strtmulti) else 'dummy'].append(tmpdev)
                 else:
-                    print "Note: device %s is already running" % (tmpdev.name)
+                    print("Note: device %s is already running" % (tmpdev.name))
             except KeyError:
                 error('invalid device: ' + tmpname)
             except AttributeError:
                 if (not strtall):
-                    print "Note: device %s is always on" % (tmpdev.name)
+                    print("Note: device %s is always on" % (tmpdev.name))
 
         # Start the devices
         firstrun = True
@@ -450,15 +451,15 @@ This requires VirtualBox Guest Additions to be installed inside the guest VM."""
                             if self.dynagen.useridledb and tmpstrt.imagename in self.dynagen.useridledb:
                                 tmpstrt.idlepc = self.dynagen.useridledb[tmpstrt.imagename]
                             else:
-                                print 'Warning: Starting %s with no idle-pc value' % tmpstrt.name
+                                print('Warning: Starting %s with no idle-pc value' % tmpstrt.name)
                         self.dynagen.check_ghost_file(tmpstrt)
                         self.dynagen.jitsharing()
                     for line in tmpstrt.start(): 
-                        print line.strip()
-                except DynamipsError, e:
+                        print(line.strip())
+                except DynamipsError as e:
                     error(e)
-                except DynamipsWarning, e:
-                    print "Note: " + str(e)
+                except DynamipsWarning as e:
+                    print("Note: " + str(e))
         return
 
     def do_stop(self, args):
@@ -466,7 +467,7 @@ This requires VirtualBox Guest Additions to be installed inside the guest VM."""
 \tstop all or a specific router(s)"""
 
         if '?' in args or args.strip() == "":
-            print self.do_stop.__doc__
+            print(self.do_stop.__doc__)
             return
 
         devices = args.split()
@@ -474,36 +475,36 @@ This requires VirtualBox Guest Additions to be installed inside the guest VM."""
             for device in self.dynagen.devices.values():
                 try:
                     for line in device.stop():
-                        print line.strip()
+                        print(line.strip())
                 except IndexError:
                     pass
                 except AttributeError:
                     # If this device doesn't support stop just ignore it
                     pass
-                except DynamipsError, e:
+                except DynamipsError as e:
                     error(e)
-                except DynamipsWarning, e:
-                    print "Note: " + str(e)
+                except DynamipsWarning as e:
+                    print("Note: " + str(e))
             return
 
         for device in devices:
             try:
-                print self.dynagen.devices[device].stop()[0].strip()
+                print(self.dynagen.devices[device].stop()[0].strip())
             except IndexError:
                 pass
             except (KeyError, AttributeError):
                 error('invalid device: ' + device)
-            except DynamipsError, e:
+            except DynamipsError as e:
                 error(e)
-            except DynamipsWarning, e:
-                print "Note: " + str(e)
+            except DynamipsWarning as e:
+                print("Note: " + str(e))
 
     def do_resume(self, args):
         """resume  {/all | router1 [router2] ...}
 \tresume all or a specific router(s)"""
 
         if '?' in args or args.strip() == "":
-            print self.do_resume.__doc__
+            print(self.do_resume.__doc__)
             return
 
         devices = args.split()
@@ -511,36 +512,36 @@ This requires VirtualBox Guest Additions to be installed inside the guest VM."""
             for device in self.dynagen.devices.values():
                 try:
                     for line in device.resume():
-                        print line.strip()
+                        print(line.strip())
                 except IndexError:
                     pass
                 except AttributeError:
                     # If this device doesn't support resume just ignore it
                     pass
-                except DynamipsError, e:
+                except DynamipsError as e:
                     error(e)
-                except DynamipsWarning, e:
-                    print "Note: " + str(e)
+                except DynamipsWarning as e:
+                    print("Note: " + str(e))
             return
 
         for device in devices:
             try:
-                print self.dynagen.devices[device].resume()[0].strip()
+                print(self.dynagen.devices[device].resume()[0].strip())
             except IndexError:
                 pass
             except (KeyError, AttributeError):
                 error('invalid device: ' + device)
-            except DynamipsError, e:
+            except DynamipsError as e:
                 error(e)
-            except DynamipsWarning, e:
-                print "Note: " + str(e)
+            except DynamipsWarning as e:
+                print("Note: " + str(e))
 
     def do_reload(self, args):
         """reload  {/all | router1 [router2] ...}
 \treload all or a specific router(s)"""
 
         if '?' in args or args.strip() == "":
-            print self.do_reload.__doc__
+            print(self.do_reload.__doc__)
             return
 
         devices = args.split()
@@ -548,55 +549,55 @@ This requires VirtualBox Guest Additions to be installed inside the guest VM."""
             for device in self.dynagen.devices.values():
                 try:
                     for line in device.stop():
-                        print line.strip()
+                        print(line.strip())
                     time.sleep(1)
                     for line in device.start():
-                        print line.strip()
+                        print(line.strip())
                 except IndexError:
                     pass
                 except AttributeError:
                     # If this device doesn't support stop/start just ignore it
                     pass
-                except DynamipsError, e:
+                except DynamipsError as e:
                     error(e)
-                except DynamipsWarning, e:
-                    print "Note: " + str(e)
+                except DynamipsWarning as e:
+                    print("Note: " + str(e))
             return
 
         for device in devices:
             try:
-                print self.dynagen.devices[device].stop()[0].strip()
+                print(self.dynagen.devices[device].stop()[0].strip())
                 time.sleep(1)
-                print self.dynagen.devices[device].start()[0].strip()
+                print(self.dynagen.devices[device].start()[0].strip())
             except IndexError:
                 pass
             except (KeyError, AttributeError):
                 error('invalid device: ' + device)
-            except DynamipsError, e:
+            except DynamipsError as e:
                 error(e)
-            except DynamipsWarning, e:
-                print "Note: " + str(e)
+            except DynamipsWarning as e:
+                print("Note: " + str(e))
 
     def do_ver(self, args):
         """Print the dynagen version and credits"""
 
-        print 'Dynagen version ' + self.namespace.VERSION
+        print('Dynagen version ' + self.namespace.VERSION)
         (zmin, zsec) = divmod(int(time.time()) - self.dynagen.starttime, 60)
         (zhur, zmin) = divmod(zmin, 60)
         (zday, zhur) = divmod(zhur, 24)
-        print ' dynagen uptime is ' + \
+        print(' dynagen uptime is ' + \
               ('%d %s, ' % (zday, 'days'  if (zday != 1) else 'day')  if (zday > 0) else '') + \
               ('%d %s, ' % (zhur, 'hours' if (zhur != 1) else 'hour') if ((zhur > 0) or (zday > 0)) else '') + \
-              ('%d %s'   % (zmin, 'mins'  if (zmin != 1) else 'min'))
+              ('%d %s'   % (zmin, 'mins'  if (zmin != 1) else 'min')))
         if (self.dynagen.dynamips.values()):
-            print ''
-            print 'Hypervisor(s) version(s):'
+            print('')
+            print('Hypervisor(s) version(s):')
         for d in self.dynagen.dynamips.values():
             if d.type == "vboxwrapper":
-                print ' %s at %s:%i has version %s (running VirtualBox %s)' % (d.type, d.host, d.port, d.version, d.vbox_version)
+                print(' %s at %s:%i has version %s (running VirtualBox %s)' % (d.type, d.host, d.port, d.version, d.vbox_version))
             else:
-                print ' %s at %s:%i has version %s' % (d.type, d.host, d.port, d.version)
-        print """
+                print(' %s at %s:%i has version %s' % (d.type, d.host, d.port, d.version))
+        print("""
 Credits:
 Dynagen is written by Greg Anuzelli
 Contributing developers: Pavel Skovajsa, Jeremy Grossmann 
@@ -607,7 +608,7 @@ Pemu: Milen Svobodnikov
 Thanks to the authors of the ConfObj library
 
 And big thanks of course to Christophe Fillot as the author of Dynamips.
-"""
+""")
 
     if PureDynagen:
         def do_shell(self, args):
@@ -621,7 +622,7 @@ And big thanks of course to Christophe Fillot as the author of Dynamips.
 \tThis is identical to the console command."""
 
         if '?' in args or args.strip() == "":
-            print self.do_telnet.__doc__
+            print(self.do_telnet.__doc__)
             return
         Console.do_console(self, args)
 
@@ -631,7 +632,7 @@ And big thanks of course to Christophe Fillot as the author of Dynamips.
         """
 
         if '?' in args or args.strip() == "":
-            print self.do_telnet.__doc__
+            print(self.do_telnet.__doc__)
             return
 
         devices = args.split()
@@ -653,17 +654,17 @@ And big thanks of course to Christophe Fillot as the author of Dynamips.
                     continue
 
                 if device.state != 'running':
-                    print 'Skipping %s device: %s' % (device.state, device.name)
+                    print('Skipping %s device: %s' % (device.state, device.name))
                     continue
                 self.telnet(device.name)
             except IndexError:
                 pass
             except (KeyError, AttributeError):
                 error('invalid device: ' + device.name)
-            except DynamipsError, e:
+            except DynamipsError as e:
                 error(e)
-            except DynamipsWarning, e:
-                print "Note: " + str(e)
+            except DynamipsWarning as e:
+                print("Note: " + str(e))
 
     def do_aux(self, args):
         """aux  {/all | router1 [router2] ...}
@@ -671,7 +672,7 @@ And big thanks of course to Christophe Fillot as the author of Dynamips.
         """
 
         if '?' in args or args.strip() == "":
-            print self.do_aux.__doc__
+            print(self.do_aux.__doc__)
             return
 
         devices = args.split()
@@ -693,17 +694,17 @@ And big thanks of course to Christophe Fillot as the author of Dynamips.
                     continue
 
                 if device.state != 'running':
-                    print 'Skipping %s device: %s' % (device.state, device.name)
+                    print('Skipping %s device: %s' % (device.state, device.name))
                     continue
                 self.aux(device.name)
             except IndexError:
                 pass
             except (KeyError, AttributeError):
                 error('invalid device: ' + device.name)
-            except DynamipsError, e:
+            except DynamipsError as e:
                 error(e)
-            except DynamipsWarning, e:
-                print "Note: " + str(e)
+            except DynamipsWarning as e:
+                print("Note: " + str(e))
 
     def show_device(self, params):
         """show device {something} command prints the output by calling get_device_info function
@@ -718,14 +719,14 @@ And big thanks of course to Christophe Fillot as the author of Dynamips.
                     output.append(device.info())
             output.sort()
             for devinfo in output:
-                print devinfo
+                print(devinfo)
         elif len(params) >= 2:
             #if this is 'show device {something}' command print info about one or more devices
             for name in params[1:]:
                 try:
                     device = self.dynagen.devices[name]
                     if isinstance(device, (self.namespace.Router, self.namespace.AnyEmuDevice, self.namespace.AnyVBoxEmuDevice, self.namespace.FRSW, self.namespace.ATMBR, self.namespace.ATMSW, self.namespace.ETHSW, self.namespace.Hub)):
-                        print device.info()
+                        print(device.info())
                 except KeyError:
                     error('unknown device: ' + name)
 
@@ -735,7 +736,7 @@ And big thanks of course to Christophe Fillot as the author of Dynamips.
         startup_config_tuple = self.dynagen.get_starting_config()
         #print out the start_config
         for line in startup_config_tuple:
-            print line
+            print(line)
 
     def show_run(self, params):
         """update the running config and print it out"""
@@ -744,7 +745,7 @@ And big thanks of course to Christophe Fillot as the author of Dynamips.
         for line in running_config_tuple:
             #we do not want to see that BIG configuration blob on the screen
             if line.find('configuration') == -1:
-                print line
+                print(line)
 
     def show_mac(self, params):
         """print out the mac table of the ETHSW in params"""
@@ -755,22 +756,22 @@ And big thanks of course to Christophe Fillot as the author of Dynamips.
                 lines = chunks.strip().split('\r\n')
                 for line in lines:
                     if line != '100-OK':
-                        print line[4:]
+                        print(line[4:])
         except IndexError:
             error('missing device')
         except (KeyError, AttributeError):
             error('invalid device: ' + params[1])
-        except DynamipsError, e:
+        except DynamipsError as e:
             error(e)
-        except DynamipsWarning, e:
-            print "Note: " + str(e)
+        except DynamipsWarning as e:
+            print("Note: " + str(e))
 
     def show_clock(self, params):
         """Print the current time and date"""
 
         tnow = time.localtime()
-        print 'Current date is ' + time.strftime('%d/%m/%Y', tnow)
-        print 'Current time is ' + time.strftime('%H:%M:%S', tnow)
+        print('Current date is ' + time.strftime('%d/%m/%Y', tnow))
+        print('Current time is ' + time.strftime('%H:%M:%S', tnow))
 
     def do_show(self, args):
         """show mac <ethernet_switch_name>
@@ -790,7 +791,7 @@ show clock
         """
 
         if '?' in args or args.strip() == "":
-            print self.do_show.__doc__
+            print(self.do_show.__doc__)
             return
 
         params = args.split()
@@ -822,7 +823,7 @@ show clock
 \tcopy running topology into startup topology"""
 
         if '?' in args or args.strip() == "":
-            print self.do_copy.__doc__
+            print(self.do_copy.__doc__)
             return
         self.dynagen.update_running_config(need_active_config=True)
         params = args.split()
@@ -839,20 +840,20 @@ show clock
 \tclear the mac address table of an ethernet switch"""
 
         if '?' in args or args.strip() == "":
-            print self.do_clear.__doc__
+            print(self.do_clear.__doc__)
             return
         params = args.split()
         if params[0].lower() == 'mac':
             try:
-                print self.dynagen.devices[params[1]].clear_mac()[0].strip()
+                print(self.dynagen.devices[params[1]].clear_mac()[0].strip())
             except IndexError:
                 error('missing device')
             except (KeyError, AttributeError):
                 error('invalid device: ' + params[1])
-            except DynamipsError, e:
+            except DynamipsError as e:
                 error(e)
-            except DynamipsWarning, e:
-                print "Note: " + str(e)
+            except DynamipsWarning as e:
+                print("Note: " + str(e))
         else:
             error('invalid clear command')
 
@@ -861,7 +862,7 @@ show clock
 \tstores router configs in the network file"""
 
         if '?' in args or args.strip() == "":
-            print self.do_save.__doc__
+            print(self.do_save.__doc__)
             return
         netfile = self.dynagen.globalconfig
         if '/all' in args.split():
@@ -883,12 +884,12 @@ show clock
             except AttributeError:
                 # This device doesn't support export
                 continue
-            except DynamipsError, e:
-                print e
+            except DynamipsError as e:
+                print(e)
                 # Try saving the other devices though
                 continue
-            except DynamipsWarning, e:
-                print "Note: " + str(e)
+            except DynamipsWarning as e:
+                print("Note: " + str(e))
 
             # What server and port is this device on?
             host = device.dynamips.host
@@ -914,7 +915,7 @@ show clock
                     netfile[serverSection][section]['configuration'] = config
                     # And populate the configurations dictionary
                     self.dynagen.configurations[device.name] = config
-                    print 'saved configuration from: ' + device.name
+                    print('saved configuration from: ' + device.name)
         netfile.write()
 
     def do_push(self, args):
@@ -923,7 +924,7 @@ show clock
         """
 
         if '?' in args or args.strip() == "":
-            print self.do_push.__doc__
+            print(self.do_push.__doc__)
             return
 
         configurations = self.dynagen.configurations
@@ -948,15 +949,15 @@ show clock
                 # This device doesn't support importing
                 continue
             except KeyError:
-                print 'No saved configuration found for device: ' + device.name
+                print('No saved configuration found for device: ' + device.name)
                 continue
-            except DynamipsError, e:
-                print e
+            except DynamipsError as e:
+                print(e)
                 # Try saving the other devices though
                 continue
-            except DynamipsWarning, e:
-                print "Note: " + str(e)
-            print 'Pushed config to: ' + device.name
+            except DynamipsWarning as e:
+                print("Note: " + str(e))
+            print('Pushed config to: ' + device.name)
 
     def do_export(self, args):
         '''export {/all | router1 [router2] ...} "directory"
@@ -965,18 +966,18 @@ show clock
         '''
 
         if '?' in args or args.strip() == "":
-            print self.do_export.__doc__
+            print(self.do_export.__doc__)
             return
         try:
             items = getItems(args)
-        except DynamipsError, e:
+        except DynamipsError as e:
             error(e)
             return
-        except DynamipsWarning, e:
-            print "Note: " + str(e)
+        except DynamipsWarning as e:
+            print("Note: " + str(e))
 
         if len(items) < 2:
-            print self.do_export.__doc__
+            print(self.do_export.__doc__)
             return
             # The last item is the directory (or should be anyway)
         directory = items.pop()
@@ -1002,7 +1003,7 @@ show clock
             if subdir != "":
                 self.debug("changing dir to -> " + subdir)
                 os.chdir(subdir)
-        except OSError, e:
+        except OSError as e:
             error(e)
             os.chdir(netdir)  # Reset the current working directory
             return
@@ -1026,22 +1027,22 @@ show clock
 
                 # This device doesn't support export
                 continue
-            except DynamipsError, e:
-                print e
+            except DynamipsError as e:
+                print(e)
                 # Try saving the other devices though
                 continue
-            except DynamipsWarning, e:
-                print "Note: " + str(e)
+            except DynamipsWarning as e:
+                print("Note: " + str(e))
             except TypeError:
                 error('Unknown error exporting config for ' + device.name)
                 continue
             # Write out the config to a file
-            print 'Exporting %s to %s' % (device.name, directory + os.sep + device.name + '.cfg')
+            print('Exporting %s to %s' % (device.name, directory + os.sep + device.name + '.cfg'))
             try:
                 f = open(directory + os.sep + device.name + '.cfg', 'w')
                 f.write(config)
                 f.close()
-            except IOError, e:
+            except IOError as e:
                 error(e)
                 os.chdir(netdir)  # Reset the current working directory
                 return
@@ -1055,7 +1056,7 @@ show clock
 \tEnclose the directory or filename in quotes if there are spaces in the filespec.'''
 
         if '?' in args or args.strip() == "":
-            print self.do_import.__doc__
+            print(self.do_import.__doc__)
             return
         items = getItems(args)
             # The last item is the directory (or should be anyway)
@@ -1069,21 +1070,21 @@ show clock
             if subdir != "":
                 self.debug("changing dir to -> " + subdir)
                 os.chdir(subdir)
-        except OSError, e:
+        except OSError as e:
             error(e)
             return
 
         # Walk through all the config files, and attempt to import them
         try:
             contents = os.listdir(directory)
-        except OSError, e:
+        except OSError as e:
             error(e)
             return
         for file in contents:
             if file[-4:].lower() == '.cfg':
                 device = file[:-4]
                 if '/all' in items or device in items:
-                    print 'Importing %s from %s' % (device, file)
+                    print('Importing %s from %s' % (device, file))
                     try:
                         f = open(directory + os.sep + file, 'r')
                         config = f.read()
@@ -1092,18 +1093,18 @@ show clock
                         # Encodestring puts in a bunch of newlines. Split them out then join them back together
                         encoded = ("").join(base64.encodestring(config).split())
                         self.dynagen.devices[device].config_b64 = encoded
-                    except IOError, e:
+                    except IOError as e:
                         error(e)
                         os.chdir(netdir)  # Reset the current working directory
                         return
                     except KeyError:
                         error('Ignoring unknown device: ' + device)
-                    except DynamipsError, e:
+                    except DynamipsError as e:
                         # Don't return, continue trying to import the other devices
                         error(e)
-                    except DynamipsWarning, e:
+                    except DynamipsWarning as e:
                         # Don't return, continue trying to import the other devices
-                        print "Note: " + str(e)
+                        print("Note: " + str(e))
 
         os.chdir(netdir)
 
@@ -1119,7 +1120,7 @@ show clock
         filters = ['freq_drop', 'capture', 'monitor', 'none']  # The known list of filters
 
         if '?' in args or args.strip() == "":
-            print self.do_filter.__doc__
+            print(self.do_filter.__doc__)
             return
 
         try:
@@ -1135,33 +1136,33 @@ show clock
                 (device, interface, filterName, direction) = args.split(None, 3)
                 options = None
         except ValueError:
-            print self.do_filter.__doc__
+            print(self.do_filter.__doc__)
             return
 
         if device not in self.dynagen.devices:
-            print 'Unknown device: ' + device
+            print('Unknown device: ' + device)
             return
         if filterName not in filters:
-            print 'Unknown filter: ' + filterName
+            print('Unknown filter: ' + filterName)
             return
 
         # Parse out the slot and port
         match_obj = self.namespace.interface_re.search(interface)
         if not match_obj:
-            print 'Error parsing interface descriptor: ' + interface
+            print('Error parsing interface descriptor: ' + interface)
             return
         try:
             (inttype, slot, port) = match_obj.group(1, 2, 3)
             slot = int(slot)
             port = int(port)
         except ValueError:
-            print 'Error parsing interface descriptor: ' + interface
+            print('Error parsing interface descriptor: ' + interface)
             return
         else:
             # Try checking for WIC interface specification (e.g. S1)
             match_obj = self.namespace.interface_noport_re.search(interface)
             if not match_obj:
-                print 'Error parsing interface descriptor: ' + interface
+                print('Error parsing interface descriptor: ' + interface)
                 return
             (inttype, port) = match_obj.group(1, 2)
             slot = 0
@@ -1177,19 +1178,19 @@ show clock
                 direction,
                 options,
                 )
-        except DynamipsError, e:
-            print e
+        except DynamipsError as e:
+            print(e)
             return
-        except DynamipsWarning, e:
-            print "Note: " + str(e)
+        except DynamipsWarning as e:
+            print("Note: " + str(e))
         except IndexError:
-            print 'No such interface %s on device %s' % (interface, device)
+            print('No such interface %s on device %s' % (interface, device))
             return
         except AttributeError:
-            print 'Interface %s on device %s is not connected' % (interface, device)
+            print('Interface %s on device %s is not connected' % (interface, device))
             return
         except AttributeError:
-            print 'Error: Interface %s on device %s is not connected' % (interface, device)
+            print('Error: Interface %s on device %s is not connected' % (interface, device))
             return
 
     def do_capture(self, args):
@@ -1214,7 +1215,7 @@ show clock
         '''
 
         if '?' in args or args.strip() == "":
-            print self.do_capture.__doc__
+            print(self.do_capture.__doc__)
             return
 
         self.dynagen.capture(args)
@@ -1224,7 +1225,7 @@ show clock
         """
 
         if '?' in args or args.strip() == "":
-            print self.do_no.__doc__
+            print(self.do_no.__doc__)
             return
 
         try:
@@ -1232,7 +1233,7 @@ show clock
             if command.lower() == 'capture':
                 self.dynagen.no_capture(options)
         except ValueError:
-            print 'Error parsing command'
+            print('Error parsing command')
             return
 
     def do_send(self, args):
@@ -1243,13 +1244,13 @@ show clock
 \tsend 127.0.0.1 hypervisor version   -- Send the 'hypervisor version' command to the host named bender"""
 
         if '?' in args or args.strip() == "":
-            print self.do_send.__doc__
+            print(self.do_send.__doc__)
             return
 
         try:
             (host, command) = args.split(None, 1)
         except ValueError:
-            print 'Error parsing command'
+            print('Error parsing command')
             return
 
         #if host not in self.namespace.dynamips:
@@ -1264,14 +1265,14 @@ show clock
 
         try:
             result = server.send_raw(command)
-        except DynamipsError, e:
-            print e
+        except DynamipsError as e:
+            print(e)
             return
-        except DynamipsWarning, e:
-            print "Note: " + str(e)
+        except DynamipsWarning as e:
+            print("Note: " + str(e))
 
         for line in result:
-            print line
+            print(line)
 
     def do_idlepc(self, args):
         '''idlepc {get|set|copy|show|save|idlemax|idlesleep|showdrift} device [value]
@@ -1300,28 +1301,28 @@ Examples:
         '''
 
         if '?' in args or args.strip() == "":
-            print self.do_idlepc.__doc__
+            print(self.do_idlepc.__doc__)
             return
         try:
             command = args.split()[0]
             command = command.lower()
             params = args.split()[1:]
             if len(params) < 1:
-                print self.do_idlepc.__doc__
+                print(self.do_idlepc.__doc__)
                 return
 
             if command == 'get' or command == 'show':
                 device = params[0]
                 if self.dynagen.devices[device].model_string == '525':
-                    print "idlepc is not supported for qemu instances."
+                    print("idlepc is not supported for qemu instances.")
                     return
 
                 if command == 'get':
                     if self.dynagen.devices[device].idlepc != None:
-                        print '%s already has an idlepc value applied.' % device
-                        print 'To recalculate idlepc for this device, remove the idlepc value from your lab or from your dynagenidledb.ini'
+                        print('%s already has an idlepc value applied.' % device)
+                        print('To recalculate idlepc for this device, remove the idlepc value from your lab or from your dynagenidledb.ini')
                         return
-                    print 'Please wait while gathering statistics...'
+                    print('Please wait while gathering statistics...')
                     result = self.dynagen.devices[device].idleprop(IDLEPROPGET)
                 elif command == 'show':
                     result = self.dynagen.devices[device].idleprop(IDLEPROPSHOW)
@@ -1338,35 +1339,35 @@ Examples:
                     else:
                         flag = " "
 
-                    print "%s %2i: %s %s" % (flag, i, value, count)
+                    print("%s %2i: %s %s" % (flag, i, value, count))
                     idles[i] = value
                     i += 1
 
                 # Allow user to choose a value by number
                 if len(idles) == 0:
                     if self.dynagen.devices[device].idlepc != None:
-                        print '%s has an idlepc value of: %s' % (device, self.dynagen.devices[device].idlepc)
+                        print('%s has an idlepc value of: %s' % (device, self.dynagen.devices[device].idlepc))
                         return
-                    print 'No idlepc values found\n'
+                    print('No idlepc values found\n')
                 else:
-                    print 'Potentially better idlepc values marked with "*"'
+                    print('Potentially better idlepc values marked with "*"')
                     selection = raw_input('Enter the number of the idlepc value to apply [1-%i] or ENTER for no change: ' % len(idles))
                     if selection == "":
-                        print 'No changes made'
+                        print('No changes made')
                         return
 
                     try:
                         selection = int(selection)
                     except ValueError:
-                        print 'Invalid selection'
+                        print('Invalid selection')
                         return
                     if selection < 1 or selection > len(idles):
-                        print 'Invalid selection'
+                        print('Invalid selection')
                         return
 
                     # Apply the selected idle
                     self.dynagen.devices[device].idleprop(IDLEPROPSET, idles[selection])
-                    print 'Applied idlepc value %s to %s\n' % (idles[selection], device)
+                    print('Applied idlepc value %s to %s\n' % (idles[selection], device))
             elif command == 'copy':
                 (device, second_dev) = params
                 if device == second_dev:
@@ -1374,7 +1375,7 @@ Examples:
                 #check if the first device has idlepc value
                 idlepc = self.dynagen.devices[device].idlepc
                 if idlepc == None:
-                    print "***Error: %s router does not idlepc value set" % device
+                    print("***Error: %s router does not idlepc value set" % device)
                     return
                 if second_dev == '/all':
                     for dev in self.dynagen.devices.values():
@@ -1384,12 +1385,12 @@ Examples:
 
                 if self.dynagen.devices[device].image == self.dynagen.devices[second_dev].image:
                     self.dynagen.devices[second_dev].idlepc = idlepc
-                    print second_dev + ': idlepc set to ' + idlepc
+                    print(second_dev + ': idlepc set to ' + idlepc)
             elif command == 'set':
 
                 (device, value) = params
                 self.dynagen.devices[device].idleprop(IDLEPROPSET, value)
-                print 'Applied idlepc value %s to %s\n' % (value, device)
+                print('Applied idlepc value %s to %s\n' % (value, device))
             elif command == 'save':
 
                 if len(params) == 1:
@@ -1398,14 +1399,14 @@ Examples:
                 elif len(params) == 2:
                     (device, location) = params
                     if location.lower() not in ['default', 'db']:
-                        print "***Error: unknown keyword %s" % location
+                        print("***Error: unknown keyword %s" % location)
                         return
                 else:
                     raise ValueError
 
                 idlepc = self.dynagen.devices[device].idlepc
                 if idlepc == None:
-                    print '****Error: device %s has no idlepc value to save' % device
+                    print('****Error: device %s has no idlepc value to save' % device)
                     return
 
                 netfile = self.dynagen.globalconfig
@@ -1436,10 +1437,10 @@ Examples:
                     self.dynagen.useridledb[self.dynagen.devices[device].imagename] = idlepc
                     try:
                         self.dynagen.useridledb.write()
-                    except IOError, e:
-                        print '***Error: ' + str(e)
+                    except IOError as e:
+                        print('***Error: ' + str(e))
                         return
-                    print 'idlepc value for image \"%s\" written to the database' % self.dynagen.devices[device].imagename
+                    print('idlepc value for image \"%s\" written to the database' % self.dynagen.devices[device].imagename)
                     return
                 else:
 
@@ -1456,18 +1457,18 @@ Examples:
 
                 # Perform a sanity check. I'd hate to trash a network file...
                 if section not in netfile[serverSection].sections:
-                    print '***Error: section %s not found in network configuration file for host %s' % (section, host)
+                    print('***Error: section %s not found in network configuration file for host %s' % (section, host))
                     return
                 netfile[serverSection][section]['idlepc'] = idlepc
                 netfile.write()
-                print 'idlepc value saved to section: ' + section
+                print('idlepc value saved to section: ' + section)
             elif command == 'showdrift':
                 device = params[0]
-                print 'Current idlemax value: %i' % self.dynagen.devices[device].idlemax
-                print 'Current idlesleep value: %i' % self.dynagen.devices[device].idlesleep
+                print('Current idlemax value: %i' % self.dynagen.devices[device].idlemax)
+                print('Current idlesleep value: %i' % self.dynagen.devices[device].idlesleep)
                 result = self.dynagen.devices[device].idlepcdrift
                 for line in result:
-                    print line[4:]
+                    print(line[4:])
                 return
             elif command in ['idlemax', 'idlesleep']:
 
@@ -1482,29 +1483,29 @@ Examples:
                     self.dynagen.devices[device].idlemax = value
                 elif command == 'idlesleep':
                     self.dynagen.devices[device].idlesleep = value
-                print device + ': ' + command + 'set to ' + str(value)
+                print(device + ': ' + command + 'set to ' + str(value))
                 return
             else:
-                print '***Error: Unknown command ' + command
+                print('***Error: Unknown command ' + command)
                 return
         except ValueError:
-            print '***Error: Incorrect number of paramaters or invalid parameters'
+            print('***Error: Incorrect number of paramaters or invalid parameters')
             return
         except KeyError:
-            print '***Error: Unknown device: ' + device
+            print('***Error: Unknown device: ' + device)
             return
-        except DynamipsError, e:
-            print e
+        except DynamipsError as e:
+            print(e)
             return
-        except DynamipsWarning, e:
-            print "Note: " + str(e)
+        except DynamipsWarning as e:
+            print("Note: " + str(e))
 
     def do_confreg(self, args):
         """confreg  {/all | router1 [router2] <0x0-0xFFFF>}
 \tset the config register(s)"""
 
         if '?' in args or args.strip() == "":
-            print self.do_confreg.__doc__
+            print(self.do_confreg.__doc__)
             return
 
         devices = args.split()
@@ -1512,7 +1513,7 @@ Examples:
             confreg = devices.pop()
             flag = 'set'
         else:
-            print "***Error: No confreg value specified"
+            print("***Error: No confreg value specified")
             return
 
         if '/all' in devices:
@@ -1528,10 +1529,10 @@ Examples:
                 except AttributeError:
                     # If this device doesn't support stop just ignore it
                     pass
-                except DynamipsError, e:
+                except DynamipsError as e:
                     error(e)
-                except DynamipsWarning, e:
-                    print "Note: " + str(e)
+                except DynamipsWarning as e:
+                    print("Note: " + str(e))
             return
 
         for device in devices:
@@ -1541,17 +1542,17 @@ Examples:
                 pass
             except (KeyError, AttributeError):
                 error('invalid device: ' + device)
-            except DynamipsError, e:
+            except DynamipsError as e:
                 error(e)
-            except DynamipsWarning, e:
-                print "Note: " + str(e)
+            except DynamipsWarning as e:
+                print("Note: " + str(e))
 
     if PureDynagen:
         def do_cpuinfo(self, args):
             """cpuinfo  {/all | router1 [router2] ...}\nshow CPU info for a specific router(s)"""
 
             if '?' in args or args.strip() == '':
-                print self.do_cpuinfo.__doc__
+                print(self.do_cpuinfo.__doc__)
                 return
 
             devices = args.split()
@@ -1559,30 +1560,30 @@ Examples:
                 for device in self.dynagen.devices.values():
                     try:
                         for line in device.cpuinfo:
-                            print line.strip()
+                            print(line.strip())
                     except IndexError:
                         pass
                     except AttributeError:
                         # If this device doesn't support cpuinfo just ignore it
                         pass
-                    except DynamipsError, e:
+                    except DynamipsError as e:
                         error(e)
-                    except DynamipsWarning, e:
-                        print "Note: " + str(e)
+                    except DynamipsWarning as e:
+                        print("Note: " + str(e))
                         return
                 return
 
             for device in devices:
                 try:
-                    print self.dynagen.devices[device].cpuinfo[0].strip()
+                    print(self.dynagen.devices[device].cpuinfo[0].strip())
                 except IndexError:
                     pass
                 except (KeyError, AttributeError):
                     error('invalid device: ' + device)
-                except DynamipsError, e:
+                except DynamipsError as e:
                     error(e)
-                except DynamipsWarning, e:
-                    print "Note: " + str(e)
+                except DynamipsWarning as e:
+                    print("Note: " + str(e))
 
     def telnet(self, device):
         """Telnet to the console port of device"""
@@ -1620,7 +1621,7 @@ Examples:
         # Debug level 2, console debugs
         if self.dynagen.debuglevel >= 2:
             curtime = time.strftime("%H:%M:%S")
-            print "%s: DEBUG (2): %s" % (curtime, unicode(string))
+            print("%s: DEBUG (2): %s" % (curtime, unicode(string)))
 
 def con_cmp(row1, row2):
     return cmp(row1[4], row2[4])
@@ -1629,11 +1630,11 @@ def con_cmp(row1, row2):
 def getItems(s):
     """Uses the CSV module to split a string by whitespace, but respecting quotes"""
 
-    input = StringIO.StringIO(s)
+    input = io.StringIO(s)
     try:
         items = csv.reader(input, delimiter=" ").next()
-    except csv.Error, e:
-        raise DynamipsError, e
+    except csv.Error as e:
+        raise DynamipsError(e)
 
     return items
 
@@ -1641,7 +1642,7 @@ def getItems(s):
 def error(msg):
     """Print out an error message"""
 
-    print '*** Error:', str(msg)
+    print('*** Error:', str(msg))
 
 
 if __name__ == '__main__':

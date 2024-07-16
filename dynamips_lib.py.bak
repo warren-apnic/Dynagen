@@ -418,7 +418,7 @@ class Dynamips(object):
         """
 
         if type(starting_udp) != int:
-            raise DynamipsError('invalid starting_udp port')
+            raise DynamipsError, 'invalid starting_udp port'
         self.__starting_udp = starting_udp
 
     def __getstarting_udp(self):
@@ -1039,17 +1039,17 @@ class BaseAdapter(object):
 
         try:
             if not adapter in ADAPTER_MATRIX[router.model][chassis][slot]:
-                raise DynamipsError('%s is not supported in slot %i on router: %s' % (adapter, slot, router.name))
+                raise DynamipsError, '%s is not supported in slot %i on router: %s' % (adapter, slot, router.name)
         except KeyError:
-            raise DynamipsError('Invalid slot %i on router: %s' % (slot, router.name))
+            raise DynamipsError, 'Invalid slot %i on router: %s' % (slot, router.name)
 
         # Does this adapter already exist in this slot? If so skip inserting it again
         try:
             if router.slot[slot].adapter == adapter:
                 return
             else:
-                raise DynamipsError('Cannot insert %s into slot %i into router %s, because the slot is already occupied by another %s' % (adapter, slot, router.name,
-                                                                                                                                           router.slot[slot].adapter))
+                raise DynamipsError, 'Cannot insert %s into slot %i into router %s, because the slot is already occupied by another %s' % (adapter, slot, router.name,
+                                                                                                                                           router.slot[slot].adapter)
         except AttributeError:
             # There is no adapter in this slot
             pass
@@ -1223,7 +1223,7 @@ class BaseAdapter(object):
         try:
             src_port = self.interfaces[localint][localport]
         except KeyError:
-            raise DynamipsError('invalid source interface')
+            raise DynamipsError, 'invalid source interface'
 
         if remoteadapter.adapter in EMULATED_SWITCHES:
             # This is a virtual switch that doesn't provide interface descriptors
@@ -1234,7 +1234,7 @@ class BaseAdapter(object):
             try:
                 dst_port = remoteadapter.interfaces[remoteint][remoteport]
             except KeyError:
-                raise DynamipsError('invalid destination interface')
+                raise DynamipsError, 'invalid destination interface'
 
         # Call the generalized connect function, validating first
         if validate_connect(
@@ -1275,14 +1275,14 @@ class BaseAdapter(object):
         filters = ['freq_drop', 'capture', 'none', 'monitor']  # a list of the known filters
         filterName = filterName.lower()
         if filterName not in filters:
-            raise DynamipsError('invalid filter')
+            raise DynamipsError, 'invalid filter'
         direction = direction.lower()
         if direction not in ['in', 'out', 'both']:
-            raise DynamipsError('invalid filter direction')
+            raise DynamipsError, 'invalid filter direction'
 
         if options == None:
             if filterName.lower() == 'capture':
-                raise DynamipsError('Error: No capture file specified')
+                raise DynamipsError, 'Error: No capture file specified'
             else:
                 options = ''
 
@@ -1293,9 +1293,9 @@ class BaseAdapter(object):
             dynaport = self.interfaces[interface][port]
             nioName = self.nio(dynaport).name
         except AttributeError:
-            raise DynamipsError('Invalid interface or interface not connected')
+            raise DynamipsError, 'Invalid interface or interface not connected'
         except KeyError:
-            raise DynamipsError('Invalid interface or interface not connected')
+            raise DynamipsError, 'Invalid interface or interface not connected'
 
         if direction == 'in':
             dirint = 0
@@ -1328,7 +1328,7 @@ class BaseAdapter(object):
         """
 
         #if port < 0 or port > len(self.ports) - 1:
-        #    raise DynamipsError('invalid port')
+        #    raise DynamipsError, 'invalid port'
 
         if nio == None:
             # Return the NETIO string
@@ -1336,7 +1336,7 @@ class BaseAdapter(object):
                 return self.__nios[port]
             except KeyError:
                 return None
-                #raise DynamipsError('port does not exist on this PA or module')
+                #raise DynamipsError, 'port does not exist on this PA or module'
         nio_t = type(nio)
         if nio_t == NIO_udp or nio_t == NIO_linux_eth or nio_t == NIO_gen_eth or nio_t == NIO_tap or nio_t == NIO_unix or nio_t == NIO_vde or nio_t == NIO_null:
             # Ginormously Ugly hack alert
@@ -1350,7 +1350,7 @@ class BaseAdapter(object):
             if self.__router.state == 'running':
                 send(self.__router.dynamips, 'vm slot_enable_nio %s %i %i' % (self.__router.name, slot, port))
         else:
-            raise DynamipsError('invalid NETIO')
+            raise DynamipsError, 'invalid NETIO'
 
         # Set the NETIO for this port
         self.__nios[port] = nio
@@ -2104,7 +2104,7 @@ class Router(Dynamips_device):
         consoleFlag=True,
         ):
         if not isinstance(dynamips, Dynamips):
-            raise DynamipsError('not a Dynamips instance')
+            raise DynamipsError, 'not a Dynamips instance'
         self.__d = dynamips
         self.__instance = Router.__instance_count
         Router.__instance_count += 1
@@ -2112,7 +2112,7 @@ class Router(Dynamips_device):
         if model in ROUTERMODELS:
             self.__model = model
         else:
-            raise DynamipsError('invalid router model')
+            raise DynamipsError, 'invalid router model'
 
         if name == None:
             self.__name = 'r' + str(self.__instance)
@@ -2222,7 +2222,7 @@ class Router(Dynamips_device):
         """
 
         if wic not in WICS:
-            raise DynamipsError('Invalid WIC: ' + wic)
+            raise DynamipsError, 'Invalid WIC: ' + wic
 
         # Peform validity checking based on router model
         # With only 3 WICs right now, this is sufficient. As the number grows
@@ -2236,15 +2236,15 @@ class Router(Dynamips_device):
                 'c3725',
                 'c3745',
                 ]:
-                raise DynamipsError('%s is not supported on router: %s' % (wic, self.name))
+                raise DynamipsError, '%s is not supported on router: %s' % (wic, self.name)
         elif wic in ['WIC-1ENET']:
             if self.model not in ['c1700']:
-                raise DynamipsError('%s is not supported on router: %s' % (wic, self.name))
+                raise DynamipsError, '%s is not supported on router: %s' % (wic, self.name)
 
         if wicslot == None:
             wicslot = self.availablewicslot(slot)
             if wicslot == -1:
-                raise DynamipsError('On router %s no available wicslots on slot %i for adapter %s' % (self.name, slot, wic))
+                raise DynamipsError, 'On router %s no available wicslots on slot %i for adapter %s' % (self.name, slot, wic)
 
         #ports = len(WICS[wic])
         base = 16 * (wicslot + 1)
@@ -2262,9 +2262,9 @@ class Router(Dynamips_device):
         try:
             self.slot[slot].wics[wicslot] = wic
         except IndexError:
-            raise DynamipsError('On router %s, invalid wic subslot %i for WIC specification: wic%i/%i' % (self.name, wicslot, slot, wicslot))
+            raise DynamipsError, 'On router %s, invalid wic subslot %i for WIC specification: wic%i/%i' % (self.name, wicslot, slot, wicslot)
         except AttributeError:
-            raise DynamipsError('On router %s, invalid wic slot %i for WIC specification: wic%i/%i' % (self.name, slot, slot, wicslot))
+            raise DynamipsError, 'On router %s, invalid wic slot %i for WIC specification: wic%i/%i' % (self.name, slot, slot, wicslot)
 
         send(self.dynamips, 'vm slot_add_binding %s %i %i %s' % (self.name, slot, base, wic))
 
@@ -2342,9 +2342,9 @@ class Router(Dynamips_device):
         """
 
         if self.__state == 'running':
-            raise DynamipsWarning('router %s is already running' % self.name)
+            raise DynamipsWarning, 'router %s is already running' % self.name
         if self.__state == 'suspended':
-            raise DynamipsError('router %s is suspended and cannot be started. Use Resume.' % self.name)
+            raise DynamipsError, 'router %s is suspended and cannot be started. Use Resume.' % self.name
 
         r = send(self.__d, 'vm start %s' % self.__name)
         self.__state = 'running'
@@ -2366,7 +2366,7 @@ class Router(Dynamips_device):
         """
 
         if self.__state == 'stopped':
-            raise DynamipsWarning('router %s is already stopped' % self.name)
+            raise DynamipsWarning, 'router %s is already stopped' % self.name
 
         # mark it stopped, even if dynamips has crashed
         self.__state = 'stopped'
@@ -2382,9 +2382,9 @@ class Router(Dynamips_device):
         """
 
         if self.__state == 'suspended':
-            raise DynamipsWarning('router %s is already suspended' % self.name)
+            raise DynamipsWarning, 'router %s is already suspended' % self.name
         if self.__state == 'stopped':
-            raise DynamipsWarning('router %s is stopped and cannot be suspended' % self.name)
+            raise DynamipsWarning, 'router %s is stopped and cannot be suspended' % self.name
 
         # mark it suspended, even if dynamips has crashed
         self.__state = 'suspended'
@@ -2400,9 +2400,9 @@ class Router(Dynamips_device):
         """
 
         if self.__state == 'running':
-            raise DynamipsWarning('router %s is already running' % self.name)
+            raise DynamipsWarning, 'router %s is already running' % self.name
         if self.__state == 'stopped':
-            raise DynamipsWarning('router %s is stopped and cannot be resumed' % self.name)
+            raise DynamipsWarning, 'router %s is stopped and cannot be resumed' % self.name
 
         r = send(self.__d, 'vm resume %s' % self.__name)
         self.__state = 'running'
@@ -2555,7 +2555,7 @@ class Router(Dynamips_device):
         """
 
         if self.__state == 'stopped':
-            raise DynamipsError('router %s is stopped. Idle-pc functions can only be used on running routers' % self.name)
+            raise DynamipsError, 'router %s is stopped. Idle-pc functions can only be used on running routers' % self.name
 
         if function == IDLEPROPGET:
             r = send(self.__d, 'vm get_idle_pc_prop %s 0' % self.__name)
@@ -2574,14 +2574,14 @@ class Router(Dynamips_device):
         """
 
         if type(console) != int or console < 1 or console > 65535:
-            raise DynamipsError('invalid console port')
+            raise DynamipsError, 'invalid console port'
 
         if console == self.__console:
             return
 
         # Check to see if the console port is already in use first
         if not self.track.tcpPortIsFree(self.__d.host, console):
-            raise DynamipsError('console port %i is already in use' % console)
+            raise DynamipsError, 'console port %i is already in use' % console
 
         send(self.__d, 'vm set_con_tcp_port %s %i' % (self.__name, console))
         self.track.setTcpPort(self.__d.host, console)
@@ -2602,14 +2602,14 @@ class Router(Dynamips_device):
         """
 
         if type(aux) != int or aux < 1 or aux > 65535:
-            raise DynamipsError('invalid aux port')
+            raise DynamipsError, 'invalid aux port'
 
         if aux == self.__aux:
             return
 
         # Check to see if the console port is already in use first
         if not self.track.tcpPortIsFree(self.__d.host, aux):
-            raise DynamipsError('aux port %i is already in use' % aux)
+            raise DynamipsError, 'aux port %i is already in use' % aux
 
         send(self.__d, 'vm set_aux_tcp_port %s %i' % (self.__name, aux))
         self.track.setTcpPort(self.__d.host, aux)
@@ -2630,10 +2630,10 @@ class Router(Dynamips_device):
         """
 
         if type(system_id) not in [str, unicode]:
-            raise DynamipsError('invalid system_id address')
+            raise DynamipsError, 'invalid system_id address'
         # look for anything up to 20 characters
         if not re.search(r"""^([0-9A-Za-z]{1,20})$""", system_id, re.IGNORECASE):
-            raise DynamipsError('Invalid Processor board ID. Format is "XXXXXXXXXXXXX".')
+            raise DynamipsError, 'Invalid Processor board ID. Format is "XXXXXXXXXXXXX".'
         self.__system_id = system_id
         send(self.__d, '%s set_system_id %s %s' % (self.__model, self.__name, self.__system_id))
 
@@ -2651,9 +2651,9 @@ class Router(Dynamips_device):
         """
 
         if type(mac) not in [str, unicode]:
-            raise DynamipsError('invalid MAC address')
+            raise DynamipsError, 'invalid MAC address'
         if not re.search(r"""^([0-9a-f][0-9a-f]\:){5}[0-9a-f][0-9a-f]$""", mac, re.IGNORECASE):
-            raise DynamipsError('Invalid MAC address. Format is "xx:xx:xx:xx:xx:xx".')
+            raise DynamipsError, 'Invalid MAC address. Format is "xx:xx:xx:xx:xx:xx".'
         self.__mac = mac
         send(self.__d, '%s set_mac_addr %s %s' % (self.__model, self.__name, self.__mac))
 
@@ -2671,7 +2671,7 @@ class Router(Dynamips_device):
         """
 
         if type(ram) != int or ram < 1:
-            raise DynamipsError('invalid ram size')
+            raise DynamipsError, 'invalid ram size'
 
         send(self.__d, 'vm set_ram %s %i' % (self.__name, ram))
         self.__ram = ram
@@ -2690,7 +2690,7 @@ class Router(Dynamips_device):
         """
 
         if type(disk0) != int or disk0 < 0:
-            raise DynamipsError('invalid disk0 size')
+            raise DynamipsError, 'invalid disk0 size'
 
         send(self.__d, 'vm set_disk0 %s %i' % (self.__name, disk0))
         self.__disk0 = disk0
@@ -2709,7 +2709,7 @@ class Router(Dynamips_device):
         """
 
         if type(disk1) != int or disk1 < 0:
-            raise DynamipsError('invalid disk1 size')
+            raise DynamipsError, 'invalid disk1 size'
 
         send(self.__d, 'vm set_disk1 %s %i' % (self.__name, disk1))
         self.__disk1 = disk1
@@ -2728,7 +2728,7 @@ class Router(Dynamips_device):
         """
 
         if type(clock) != int or clock < 1:
-            raise DynamipsError('invalid clock')
+            raise DynamipsError, 'invalid clock'
 
         send(self.__d, 'vm set_clock_divisor %s %i' % (self.__name, clock))
         self.__clock = clock
@@ -2747,7 +2747,7 @@ class Router(Dynamips_device):
         """
 
         if type(mmap) != bool:
-            raise DynamipsError('invalid mmap')
+            raise DynamipsError, 'invalid mmap'
 
         if mmap:
             flag = 1
@@ -2780,7 +2780,7 @@ class Router(Dynamips_device):
             'npe-g1',
             'npe-g2',
             ]:
-            raise DynamipsError('invalid NPE type')
+            raise DynamipsError, 'invalid NPE type'
 
         if self.__state != 'running':
             #TODO this is overhere because of dynamips bug
@@ -2824,7 +2824,7 @@ class Router(Dynamips_device):
                 self.__npe = npe
 
         else:
-            raise DynamipsError('Cannot change NPE on running router')
+            raise DynamipsError, 'Cannot change NPE on running router'
 
     def __getnpe(self):
         """ Returns npe property
@@ -2840,7 +2840,7 @@ class Router(Dynamips_device):
         """
 
         if type(midplane) not in [str, unicode] or midplane not in ['std', 'vxr']:
-            raise DynamipsError('invalid midplane type')
+            raise DynamipsError, 'invalid midplane type'
 
         send(self.__d, '%s set_midplane %s %s' % (self.__model, self.__name, midplane))
         self.__midplane = midplane
@@ -2859,7 +2859,7 @@ class Router(Dynamips_device):
         """
 
         if type(nvram) != int or nvram < 1:
-            raise DynamipsError('invalid nvram size')
+            raise DynamipsError, 'invalid nvram size'
 
         send(self.__d, 'vm set_nvram %s %i' % (self.__name, nvram))
         self.__nvram = nvram
@@ -3052,7 +3052,7 @@ class Router(Dynamips_device):
         """
 
         if type(state) != bool:
-            raise DynamipsError('invalid oldidle status')
+            raise DynamipsError, 'invalid oldidle status'
         self.__oldidle = state
         if state:
             val = 1
@@ -3132,7 +3132,7 @@ class Router(Dynamips_device):
         """
 
         if not self.imagename:
-            raise DynamipsError('Register an image first')
+            raise DynamipsError, 'Register an image first'
 
         send(self.__d, 'vm set_tsg %s %s' % (self.__name, str(jitsharing_group)))
         self.__jitsharing_group = jitsharing_group
@@ -3349,7 +3349,7 @@ class C2600(Router):
             debug('Invalid chassis passed to __setchassis')
             debug("chassis -> '" + str(chassis) + "'")
             debug('chassis type -> ' + str(type(chassis)))
-            raise DynamipsError('invalid chassis type')
+            raise DynamipsError, 'invalid chassis type'
         self.__chassis = chassis
         self.model_string = self.__chassis
         send(self.__d, 'c2600 set_chassis %s %s' % (self.__name, self.__chassis))
@@ -3467,7 +3467,7 @@ class C3600(Router):
             self.slot[0] = Leopard_2FE(self, 0)
         else:
             debug('Unable to match chassis type. Chassis -> ' + str(chassis))
-            raise DynamipsError('invalid chassis type')
+            raise DynamipsError, 'invalid chassis type'
 
     def __setchassis(self, chassis):
         """ Set the chassis property
@@ -3478,7 +3478,7 @@ class C3600(Router):
             debug('Invalid chassis passed to __setchassis')
             debug("chassis -> '" + str(chassis) + "'")
             debug('chassis type -> ' + str(type(chassis)))
-            raise DynamipsError('invalid chassis type')
+            raise DynamipsError, 'invalid chassis type'
         self.__chassis = chassis
         send(self.__d, 'c3600 set_chassis %s %s' % (self.__name, self.__chassis))
 
@@ -3498,9 +3498,9 @@ class C3600(Router):
         try:
             iomem = int(iomem)
         except ValueError:
-            raise DynamipsError('invalid iomem type, must be an integer')
+            raise DynamipsError, 'invalid iomem type, must be an integer'
         if iomem % 5 != 0:
-            raise DynamipsError('iomem must be a multiple of 5')
+            raise DynamipsError, 'iomem must be a multiple of 5'
         self.__iomem = iomem
         send(self.__d, 'c3600 set_iomem %s %s' % (self.__name, self.__iomem))
 
@@ -3576,7 +3576,7 @@ class C1700(Router):
             debug('Invalid chassis passed to __setchassis')
             debug("chassis -> '" + str(chassis) + "'")
             debug('chassis type -> ' + str(type(chassis)))
-            raise DynamipsError('invalid chassis type')
+            raise DynamipsError, 'invalid chassis type'
         self.__chassis = chassis
         send(self.__d, 'c1700 set_chassis %s %s' % (self.__name, self.__chassis))
 
@@ -3596,9 +3596,9 @@ class C1700(Router):
         try:
             iomem = int(iomem)
         except ValueError:
-            raise DynamipsError('invalid iomem type, must be an integer')
+            raise DynamipsError, 'invalid iomem type, must be an integer'
         if iomem % 5 != 0:
-            raise DynamipsError('iomem must be a multiple of 5')
+            raise DynamipsError, 'iomem must be a multiple of 5'
         self.__iomem = iomem
         send(self.__d, 'c1700 set_iomem %s %s' % (self.__name, self.__iomem))
 
@@ -3748,14 +3748,14 @@ class Emulated_switch(Dynamips_device):
             filters = ['freq_drop', 'capture', 'none']  # a list of the known filters
             filterName = filterName.lower()
             if filterName not in filters:
-                raise DynamipsError('invalid filter')
+                raise DynamipsError, 'invalid filter'
             direction = direction.lower()
             if direction not in ['in', 'out', 'both']:
-                raise DynamipsError('invalid filter direction')
+                raise DynamipsError, 'invalid filter direction'
 
             if options == None:
                 if filterName.lower() == 'capture':
-                    raise DynamipsError('Error: No capture file specified')
+                    raise DynamipsError, 'Error: No capture file specified'
                 else:
                     options = ''
 
@@ -3765,9 +3765,9 @@ class Emulated_switch(Dynamips_device):
                 port = int(port)
                 nioName = self.nio(port).name
             except AttributeError:
-                raise DynamipsError('Invalid interface')
+                raise DynamipsError, 'Invalid interface'
             except KeyError:
-                raise DynamipsError('Invalid interface')
+                raise DynamipsError, 'Invalid interface'
 
             if direction == 'in':
                 dirint = 0
@@ -3836,7 +3836,7 @@ class Bridge(Emulated_switch):
         if isinstance(nio, NIO):
             send(self._d, 'nio_bridge add_nio %s %s' % (self._name, nio.name))
         else:
-            raise DynamipsError('invalid NIO type')
+            raise DynamipsError, 'invalid NIO type'
 
         # Add the NETIO to the list
         self._nios.append(nio)
@@ -3927,25 +3927,25 @@ class FRSW(Emulated_switch):
         # are associated with those ports
 
         if type(port1) != int or port1 < 0:
-            raise DynamipsError('invalid port1. Must be an int >= 0')
+            raise DynamipsError, 'invalid port1. Must be an int >= 0'
         if type(port2) != int or port2 < 0:
-            raise DynamipsError('invalid port2. Must be an int >= 0')
+            raise DynamipsError, 'invalid port2. Must be an int >= 0'
         if type(dlci1) != int or dlci1 < 0:
-            raise DynamipsError('invalid dlci1. Must be an int >= 0')
+            raise DynamipsError, 'invalid dlci1. Must be an int >= 0'
         if type(dlci2) != int or dlci2 < 0:
-            raise DynamipsError('invalid dlci1. Must be an int >= 0')
+            raise DynamipsError, 'invalid dlci1. Must be an int >= 0'
 
         try:
             try:
                 nio1 = self.nio(port1).name
-            except AttributeError as e:
-                raise DynamipsError('nothing connected to port %s, it does not exist' % (port1))
+            except AttributeError, e:
+                raise DynamipsError, 'nothing connected to port %s, it does not exist' % (port1)
             try:
                 nio2 = self.nio(port2).name
-            except AttributeError as e:
-                raise DynamipsError('nothing connected to port %s, it does not exist' % (port2))
-        except DynamipsWarning as e:
-            raise DynamipsError(e)
+            except AttributeError, e:
+                raise DynamipsError, 'nothing connected to port %s, it does not exist' % (port2)
+        except DynamipsWarning, e:
+            raise DynamipsError, e
 
 
         send(self._d, 'frsw create_vc %s %s %i %s %i' % (
@@ -3995,25 +3995,25 @@ class FRSW(Emulated_switch):
         # are associated with those ports
 
         if type(port1) != int or port1 < 0:
-            raise DynamipsError('invalid port1. Must be an int >= 0')
+            raise DynamipsError, 'invalid port1. Must be an int >= 0'
         if type(port2) != int or port2 < 0:
-            raise DynamipsError('invalid port2. Must be an int >= 0')
+            raise DynamipsError, 'invalid port2. Must be an int >= 0'
         if type(dlci1) != int or dlci1 < 0:
-            raise DynamipsError('invalid dlci1. Must be an int >= 0')
+            raise DynamipsError, 'invalid dlci1. Must be an int >= 0'
         if type(dlci2) != int or dlci2 < 0:
-            raise DynamipsError('invalid dlci1. Must be an int >= 0')
+            raise DynamipsError, 'invalid dlci1. Must be an int >= 0'
 
         try:
             try:
                 nio1 = self.nio(port1).name
-            except AttributeError as e:
-                raise DynamipsError('nothing connected to port %s, it does not exist' % (port1))
+            except AttributeError, e:
+                raise DynamipsError, 'nothing connected to port %s, it does not exist' % (port1)
             try:
                 nio2 = self.nio(port2).name
-            except AttributeError as e:
-                raise DynamipsError('nothing connected to port %s, it does not exist' % (port2))
-        except DynamipsWarning as e:
-            raise DynamipsError(e)
+            except AttributeError, e:
+                raise DynamipsError, 'nothing connected to port %s, it does not exist' % (port2)
+        except DynamipsWarning, e:
+            raise DynamipsError, e
 
         send(self._d, 'frsw delete_vc %s %s %i %s %i' % (self._name, nio1, dlci1, nio2, dlci2))
 
@@ -4039,7 +4039,7 @@ class FRSW(Emulated_switch):
             # Set the NETIO for this port
             self._nios[port] = nio
         else:
-            raise DynamipsError('invalid NIO type')
+            raise DynamipsError, 'invalid NIO type'
 
     def _getadapter(self):
         """ Returns the adapter property
@@ -4146,25 +4146,25 @@ class ATMBR(Emulated_switch):
         # are associated with those ports
 
         if type(port1) != int or port1 < 0:
-            raise DynamipsError('invalid port1. Must be an int >= 0')
+            raise DynamipsError, 'invalid port1. Must be an int >= 0'
         if type(port2) != int or port2 < 0:
-            raise DynamipsError('invalid port2. Must be an int >= 0')
+            raise DynamipsError, 'invalid port2. Must be an int >= 0'
         if type(vpi2) != int or vpi2 < 0:
-            raise DynamipsError('invalid vpi2. Must be an int >= 0')
+            raise DynamipsError, 'invalid vpi2. Must be an int >= 0'
         if type(vci2) != int or vci2 < 0:
-            raise DynamipsError('invalid vci2. Must be an int >= 0')
+            raise DynamipsError, 'invalid vci2. Must be an int >= 0'
 
         try:
             try:
                 nio1 = self.nio(port1).name
-            except AttributeError as e:
-                raise DynamipsError('nothing connected to port %s, it does not exist' % (port1))
+            except AttributeError, e:
+                raise DynamipsError, 'nothing connected to port %s, it does not exist' % (port1)
             try:
                 nio2 = self.nio(port2).name
-            except AttributeError as e:
-                raise DynamipsError('nothing connected to port %s, it does not exist' % (port2))
-        except DynamipsWarning as e:
-            raise DynamipsError(e)
+            except AttributeError, e:
+                raise DynamipsError, 'nothing connected to port %s, it does not exist' % (port2)
+        except DynamipsWarning, e:
+            raise DynamipsError, e
 
         send(self._d, 'atm_bridge configure %s %s %s %i %i' % (
             self._name,
@@ -4195,25 +4195,25 @@ class ATMBR(Emulated_switch):
         # are associated with those ports
 
         if type(port1) != int or port1 < 0:
-            raise DynamipsError('invalid port1. Must be an int >= 0')
+            raise DynamipsError, 'invalid port1. Must be an int >= 0'
         if type(port2) != int or port2 < 0:
-            raise DynamipsError('invalid port2. Must be an int >= 0')
+            raise DynamipsError, 'invalid port2. Must be an int >= 0'
         if type(vpi2) != int or vpi2 < 0:
-            raise DynamipsError('invalid vpi2. Must be an int >= 0')
+            raise DynamipsError, 'invalid vpi2. Must be an int >= 0'
         if type(vci2) != int or vci2 < 0:
-            raise DynamipsError('invalid vci2. Must be an int >= 0')
+            raise DynamipsError, 'invalid vci2. Must be an int >= 0'
 
         try:
             try:
                 nio1 = self.nio(port1).name
-            except AttributeError as e:
-                raise DynamipsError('nothing connected to port %s, it does not exist' % (port1))
+            except AttributeError, e:
+                raise DynamipsError, 'nothing connected to port %s, it does not exist' % (port1)
             try:
                 nio2 = self.nio(port2).name
-            except AttributeError as e:
-                raise DynamipsError('nothing connected to port %s, it does not exist' % (port2))
-        except DynamipsWarning as e:
-            raise DynamipsError(e)
+            except AttributeError, e:
+                raise DynamipsError, 'nothing connected to port %s, it does not exist' % (port2)
+        except DynamipsWarning, e:
+            raise DynamipsError, e
 
         send(self._d, 'atm_bridge unconfigure %s' % self._name)
 
@@ -4254,7 +4254,7 @@ class ATMBR(Emulated_switch):
             # Set the NETIO for this port
             self._nios[port] = nio
         else:
-            raise DynamipsError('invalid NIO type')
+            raise DynamipsError, 'invalid NIO type'
 
     def _getadapter(self):
         """Returns the adapter property
@@ -4366,25 +4366,25 @@ class ATMSW(Emulated_switch):
         # are associated with those ports
 
         if type(port1) != int or port1 < 0:
-            raise DynamipsError('invalid port1. Must be an int >= 0')
+            raise DynamipsError, 'invalid port1. Must be an int >= 0'
         if type(port2) != int or port2 < 0:
-            raise DynamipsError('invalid port2. Must be an int >= 0')
+            raise DynamipsError, 'invalid port2. Must be an int >= 0'
         if type(vpi1) != int or vpi1 < 0:
-            raise DynamipsError('invalid vpi1. Must be an int >= 0')
+            raise DynamipsError, 'invalid vpi1. Must be an int >= 0'
         if type(vpi2) != int or vpi2 < 0:
-            raise DynamipsError('invalid vpi2. Must be an int >= 0')
+            raise DynamipsError, 'invalid vpi2. Must be an int >= 0'
 
         try:
             try:
                 nio1 = self.nio(port1).name
-            except AttributeError as e:
-                raise DynamipsError('nothing connected to port %s, it does not exist' % (port1))
+            except AttributeError, e:
+                raise DynamipsError, 'nothing connected to port %s, it does not exist' % (port1)
             try:
                 nio2 = self.nio(port2).name
-            except AttributeError as e:
-                raise DynamipsError('nothing connected to port %s, it does not exist' % (port2))
-        except DynamipsWarning as e:
-            raise DynamipsError(e)
+            except AttributeError, e:
+                raise DynamipsError, 'nothing connected to port %s, it does not exist' % (port2)
+        except DynamipsWarning, e:
+            raise DynamipsError, e
 
         send(self._d, 'atmsw delete_vpc %s %s %i %s %i' % (
             self._name,
@@ -4414,25 +4414,25 @@ class ATMSW(Emulated_switch):
         # are associated with those ports
 
         if type(port1) != int or port1 < 0:
-            raise DynamipsError('invalid port1. Must be an int >= 0')
+            raise DynamipsError, 'invalid port1. Must be an int >= 0'
         if type(port2) != int or port2 < 0:
-            raise DynamipsError('invalid port2. Must be an int >= 0')
+            raise DynamipsError, 'invalid port2. Must be an int >= 0'
         if type(vpi1) != int or vpi1 < 0:
-            raise DynamipsError('invalid vpi1. Must be an int >= 0')
+            raise DynamipsError, 'invalid vpi1. Must be an int >= 0'
         if type(vpi2) != int or vpi2 < 0:
-            raise DynamipsError('invalid vpi2. Must be an int >= 0')
+            raise DynamipsError, 'invalid vpi2. Must be an int >= 0'
 
         try:
             try:
                 nio1 = self.nio(port1).name
-            except AttributeError as e:
-                raise DynamipsError('nothing connected to port %s, it does not exist' % (port1))
+            except AttributeError, e:
+                raise DynamipsError, 'nothing connected to port %s, it does not exist' % (port1)
             try:
                 nio2 = self.nio(port2).name
-            except AttributeError as e:
-                raise DynamipsError('nothing connected to port %s, it does not exist' % (port2))
-        except DynamipsWarning as e:
-            raise DynamipsError(e)
+            except AttributeError, e:
+                raise DynamipsError, 'nothing connected to port %s, it does not exist' % (port2)
+        except DynamipsWarning, e:
+            raise DynamipsError, e
 
         send(self._d, 'atmsw create_vpc %s %s %i %s %i' % (
             self._name,
@@ -4465,29 +4465,29 @@ class ATMSW(Emulated_switch):
         # are associated with those ports
 
         if type(port1) != int or port1 < 0:
-            raise DynamipsError('invalid port1. Must be an int >= 0')
+            raise DynamipsError, 'invalid port1. Must be an int >= 0'
         if type(port2) != int or port2 < 0:
-            raise DynamipsError('invalid port2. Must be an int >= 0')
+            raise DynamipsError, 'invalid port2. Must be an int >= 0'
         if type(vpi1) != int or vpi1 < 0:
-            raise DynamipsError('invalid vpi1. Must be an int >= 0')
+            raise DynamipsError, 'invalid vpi1. Must be an int >= 0'
         if type(vpi2) != int or vpi2 < 0:
-            raise DynamipsError('invalid vpi2. Must be an int >= 0')
+            raise DynamipsError, 'invalid vpi2. Must be an int >= 0'
         if type(vci1) != int or vci1 < 0:
-            raise DynamipsError('invalid vci1. Must be an int >= 0')
+            raise DynamipsError, 'invalid vci1. Must be an int >= 0'
         if type(vci2) != int or vci2 < 0:
-            raise DynamipsError('invalid vci2. Must be an int >= 0')
+            raise DynamipsError, 'invalid vci2. Must be an int >= 0'
 
         try:
             try:
                 nio1 = self.nio(port1).name
-            except AttributeError as e:
-                raise DynamipsError('nothing connected to port %s, it does not exist' % (port1))
+            except AttributeError, e:
+                raise DynamipsError, 'nothing connected to port %s, it does not exist' % (port1)
             try:
                 nio2 = self.nio(port2).name
-            except AttributeError as e:
-                raise DynamipsError('nothing connected to port %s, it does not exist' % (port2))
-        except DynamipsWarning as e:
-            raise DynamipsError(e)
+            except AttributeError, e:
+                raise DynamipsError, 'nothing connected to port %s, it does not exist' % (port2)
+        except DynamipsWarning, e:
+            raise DynamipsError, e
 
         send(self._d, 'atmsw delete_vcc %s %s %i %i %s %i %i' % (
             self._name,
@@ -4521,29 +4521,29 @@ class ATMSW(Emulated_switch):
         # are associated with those ports
 
         if type(port1) != int or port1 < 0:
-            raise DynamipsError('invalid port1. Must be an int >= 0')
+            raise DynamipsError, 'invalid port1. Must be an int >= 0'
         if type(port2) != int or port2 < 0:
-            raise DynamipsError('invalid port2. Must be an int >= 0')
+            raise DynamipsError, 'invalid port2. Must be an int >= 0'
         if type(vpi1) != int or vpi1 < 0:
-            raise DynamipsError('invalid vpi1. Must be an int >= 0')
+            raise DynamipsError, 'invalid vpi1. Must be an int >= 0'
         if type(vpi2) != int or vpi2 < 0:
-            raise DynamipsError('invalid vpi2. Must be an int >= 0')
+            raise DynamipsError, 'invalid vpi2. Must be an int >= 0'
         if type(vci1) != int or vci1 < 0:
-            raise DynamipsError('invalid vci1. Must be an int >= 0')
+            raise DynamipsError, 'invalid vci1. Must be an int >= 0'
         if type(vci2) != int or vci2 < 0:
-            raise DynamipsError('invalid vci2. Must be an int >= 0')
+            raise DynamipsError, 'invalid vci2. Must be an int >= 0'
 
         try:
             try:
                 nio1 = self.nio(port1).name
-            except AttributeError as e:
-                raise DynamipsError('nothing connected to port %s, it does not exist' % (port1))
+            except AttributeError, e:
+                raise DynamipsError, 'nothing connected to port %s, it does not exist' % (port1)
             try:
                 nio2 = self.nio(port2).name
-            except AttributeError as e:
-                raise DynamipsError('nothing connected to port %s, it does not exist' % (port2))
-        except DynamipsWarning as e:
-            raise DynamipsError(e)
+            except AttributeError, e:
+                raise DynamipsError, 'nothing connected to port %s, it does not exist' % (port2)
+        except DynamipsWarning, e:
+            raise DynamipsError, e
 
         send(self._d, 'atmsw create_vcc %s %s %i %i %s %i %i' % (
             self._name,
@@ -4600,14 +4600,14 @@ class ATMSW(Emulated_switch):
                 return self._nios[port]
             except KeyError:
                 return None
-            except AttributeError as e:
-                raise DynamipsError('nothing connected to port %s, it does not exist' % (port))
+            except AttributeError, e:
+                raise DynamipsError, 'nothing connected to port %s, it does not exist' % (port)
 
         if isinstance(nio, NIO):
             # Set the NETIO for this port
             self._nios[port] = nio
         else:
-            raise DynamipsError('invalid NIO type')
+            raise DynamipsError, 'invalid NIO type'
 
     def _getadapter(self):
         """ Returns the adapter property
@@ -4711,13 +4711,13 @@ class ETHSW(Emulated_switch):
         """ unset the port from access or dot1q """
         """ TODO talk to Chris about adding a IPC for this"""
         if type(port) != int:
-            raise DynamipsError('invalid port. Must be an int >= 0')
+            raise DynamipsError, 'invalid port. Must be an int >= 0'
         try:
             nio = self.nio(port).name
-        except DynamipsWarning as e:
-            raise DynamipsError(e)
-        except AttributeError as e:
-            raise DynamipsError('the switchport does not exist')
+        except DynamipsWarning, e:
+            raise DynamipsError, e
+        except AttributeError, e:
+            raise DynamipsError, 'the switchport does not exist'
 
         #not implemented yet in dynamips
         #send(self._d, 'ethsw unset_port ' + self._name + ' ' + nio + ' ' + str(vlan))
@@ -4731,19 +4731,19 @@ class ETHSW(Emulated_switch):
         '''
 
         if type(port) != int:
-            raise DynamipsError('invalid port. Must be an int >= 0')
+            raise DynamipsError, 'invalid port. Must be an int >= 0'
         if type(vlan) != int:
-            raise DynamipsError('invalid vlan. Must be an int >= 0')
+            raise DynamipsError, 'invalid vlan. Must be an int >= 0'
         try:
             nio = self.nio(port).name
-        except DynamipsWarning as e:
-            raise DynamipsError(e)
-        except AttributeError as e:
-            raise DynamipsError('the switchport does not exist')
+        except DynamipsWarning, e:
+            raise DynamipsError, e
+        except AttributeError, e:
+            raise DynamipsError, 'the switchport does not exist'
 
         porttype = porttype.lower()
         if porttype != 'access' and porttype != 'dot1q' and porttype != 'qinq':
-            raise DynamipsError('invalid porttype')
+            raise DynamipsError, 'invalid porttype'
 
         send(self._d, 'ethsw set_' + porttype + '_port ' + self._name + ' ' + nio + ' ' + str(vlan))
         self.mapping[port] = (porttype, vlan, self.nio(port), True)
@@ -4766,8 +4766,8 @@ class ETHSW(Emulated_switch):
         """
         try:
             nio = self.nio(localport).name
-        except DynamipsWarning as e:
-            raise DynamipsError(e)
+        except DynamipsWarning, e:
+            raise DynamipsError, e
 
         send(self._d, 'ethsw remove_nio %s %s' % (self._name, nio))
         del self.mapping[localport]
@@ -4804,14 +4804,14 @@ class ETHSW(Emulated_switch):
         if isinstance(nio, NIO):
             send(self._d, 'ethsw add_nio %s %s' % (self._name, nio.name))
         else:
-            raise DynamipsError('invalid NIO type')
+            raise DynamipsError, 'invalid NIO type'
 
         # Set the NETIO for this port
         self.nios[port] = nio
         if porttype != None:
             porttype = porttype.lower()
             if porttype != 'access' and porttype != 'dot1q' and porttype!= 'qinq':
-                raise DynamipsError('invalid porttype')
+                raise DynamipsError, 'invalid porttype'
 
             send(self._d, 'ethsw set_' + porttype + '_port ' + self._name + ' ' + nio.name + ' ' + str(vlan))
             self.mapping[port] = (porttype, vlan, nio, False)
@@ -4888,8 +4888,8 @@ class Hub(Emulated_switch):
         """
         try:
             nio = self.nio(localport).name
-        except DynamipsWarning as e:
-            raise DynamipsError(e)
+        except DynamipsWarning, e:
+            raise DynamipsError, e
 
         send(self._d, 'nio_bridge remove_nio %s %s' % (self._name, nio))
 
@@ -4922,7 +4922,7 @@ class Hub(Emulated_switch):
         if isinstance(nio, NIO):
             send(self._d, 'nio_bridge add_nio %s %s' % (self._name, nio.name))
         else:
-            raise DynamipsError('invalid NIO type')
+            raise DynamipsError, 'invalid NIO type'
 
         # Set the NETIO for this port
         self.nios[port] = nio
@@ -5018,13 +5018,13 @@ def send(dynamips, command):
             if error_re.search(data[-1]):
                 debug('returned -> ' + str(data))
                 dynamips.configchange = True
-                raise DynamipsError(data[-1])
+                raise DynamipsError, data[-1]
 
             # Otherwise loop throught again and get the the next line of data
 
         if len(data) == 0:
-            print('Error: no data returned from %s server %s. Server crashed?' % (dynamips.type, dynamips.host))
-            raise DynamipsError('no data')
+            print 'Error: no data returned from %s server %s. Server crashed?' % (dynamips.type, dynamips.host)
+            raise DynamipsError, 'no data'
 
         debug('returned -> ' + str(data))
 
@@ -5136,7 +5136,7 @@ def validate_connect(
     poss = 'p'
 
     #if a1 == 'Bridge' and a2 == 'Bridge':
-    #    raise DynamipsError('attempt to connect two bridges')
+    #    raise DynamipsError, 'attempt to connect two bridges'
 
     if i1 in ethernets and i2 in ethernets:
         pass
@@ -5158,7 +5158,7 @@ def validate_connect(
         """
 
     else:
-        raise DynamipsError('cannot connect %s to %s' % (i1, i2))
+        raise DynamipsError, 'cannot connect %s to %s' % (i1, i2)
 
     #check whether there is not already an existing connection on local int
     if (isinstance(src_adapter, BaseAdapter) and isinstance(dst_adapter, BaseAdapter)) or (isinstance(src_adapter, Emulated_switch) and isinstance(dst_adapter, Emulated_switch)) or (isinstance(src_adapter, Emulated_switch) and isinstance(dst_adapter, BaseAdapter)) or (isinstance(src_adapter, BaseAdapter) and isinstance(dst_adapter, Emulated_switch)):
@@ -5166,9 +5166,9 @@ def validate_connect(
         remote_nio = dst_adapter.nio(dst_port)
         if local_nio != None or remote_nio != None:
             if local_nio == None:  # only remote_nio must be occupied
-                raise DynamipsError('destination port is already occupied by a different connection')
+                raise DynamipsError, 'destination port is already occupied by a different connection'
             elif remote_nio == None:  # only local_nio must be occupied
-                raise DynamipsError('source port is already occupied by a different connection')
+                raise DynamipsError, 'source port is already occupied by a different connection'
             elif local_nio != None and remote_nio != None:  #both are occupied
                 #check whether this is not a reverse UDP connection
                 if type(local_nio) == NIO_udp and type(remote_nio) == NIO_udp:
@@ -5178,9 +5178,9 @@ def validate_connect(
                         #this is good state, it means we should not make this UDP connection again as it was done previously
                         return False
                     else:  #UDP ports do NOT match
-                        raise DynamipsError('source and destination ports are already occupied by a different connection')
+                        raise DynamipsError, 'source and destination ports are already occupied by a different connection'
                 else:  #both occupied and NOT a UDP connection
-                    raise DynamipsError('source and destination ports are already occupied by a different connection')
+                    raise DynamipsError, 'source and destination ports are already occupied by a different connection'
     elif isinstance(dst_adapter, BaseAdapter):  #src_adapter is Qemu, so this is emulated device -> router connection
         remote_nio = dst_adapter.nio(dst_port)
         if src_adapter.nios.has_key(src_port):
@@ -5189,9 +5189,9 @@ def validate_connect(
             local_nio = None
         if local_nio != None or remote_nio != None:
             if local_nio == None:  # only remote_nio must be occupied
-                raise DynamipsError('destination port is already occupied by a different connection')
+                raise DynamipsError, 'destination port is already occupied by a different connection'
             elif remote_nio == None:  # only local_nio must be occupied
-                raise DynamipsError('source port is already occupied by a different connection')
+                raise DynamipsError, 'source port is already occupied by a different connection'
             elif local_nio != None and remote_nio != None:  #both are occupied
                 #check whether this is not a reverse UDP connection
                 if type(remote_nio) == NIO_udp:
@@ -5200,9 +5200,9 @@ def validate_connect(
                         #this is good state, it means we should not make this UDP connection again as it was done previously
                         return False
                     else:  #UDP ports do NOT match
-                        raise DynamipsError('source and destination ports are already occupied by a different connection')
+                        raise DynamipsError, 'source and destination ports are already occupied by a different connection'
                 else:  #both occupied and NOT a UDP connection
-                    raise DynamipsError('source and destination ports are already occupied by a different connection')
+                    raise DynamipsError, 'source and destination ports are already occupied by a different connection'
     return True
 
 def get_reverse_udp_nio(remote_nio):
@@ -5267,7 +5267,7 @@ def dowarning(msg):
     """Print out minor warning messages
     """
 
-    print('*** Warning: ', unicode(msg))
+    print '*** Warning: ', unicode(msg)
 
 
 def debug(string):
@@ -5278,7 +5278,7 @@ def debug(string):
 
     if DEBUG:
         curtime = time.strftime("%H:%M:%S")
-        print("%s: DEBUG (1): %s" % (curtime, unicode(string)))
+        print "%s: DEBUG (1): %s" % (curtime, unicode(string))
 
 if __name__ == '__main__':
     import sys
@@ -5315,7 +5315,7 @@ if __name__ == '__main__':
 
     r1.slot[0].connect('s', 0, d, r2.slot[0], 's', 0)   # r1 s0/0 = r2 s0/0
 
-    print(r1.slot[0].connected('s', 0))
+    print r1.slot[0].connected('s', 0)
 
     #r1.start()
     #r2.start()
